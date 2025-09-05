@@ -13,6 +13,7 @@ from qfluentwidgets import (
 from qfluentwidgets import FluentIcon as FIF
 from typing import Optional
 from models.config.app_config import _app_cfg, AUTHOR, YEAR, HELP_URL, VERSION, isWin11
+from models.theme.style_sheet import StyleSheet
 
 
 class SettingsInterface(ScrollArea):
@@ -101,8 +102,7 @@ class SettingsInterface(ScrollArea):
         # 初始化样式
         self.scrollWidget.setObjectName("scrollWidget")
         self.settingLabel.setObjectName("settingLabel")
-        # StyleSheet.SETTING_INTERFACE.apply(self)
-        self.settingLabel.setStyleSheet("font-size: 33px; font-family: 'Microsoft YaHei Light';")
+        StyleSheet.SETTING_INTERFACE.apply(self)
 
         self.micaCard.setEnabled(isWin11())
 
