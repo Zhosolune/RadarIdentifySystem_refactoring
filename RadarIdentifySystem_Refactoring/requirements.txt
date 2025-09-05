@@ -1,0 +1,27 @@
+# UI Framework
+PyQt6>=6.4.0
+PyQt6-Fluent-Widgets>=1.1.0
+
+# Logging
+loguru>=0.7.0
+
+# Data Processing
+matplotlib~=3.9.2
+numpy~=2.0.2
+pillow~=11.0.0
+scipy~=1.14.1
+pandas~=2.2.3
+openpyxl~=3.1.5
+scikit-learn~=1.6.0
+
+# Machine Learning
+tensorflow~=2.18.0
+keras~=3.7.0
+
+# Build Tools
+setuptools~=75.6.0
+pyinstaller==6.11.1
+
+# Testing
+pytest>=7.0.0
+pytest-qt>=4.0.0
