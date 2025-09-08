@@ -26,6 +26,8 @@ class MainWindow(MSFluentWindow, LoggerMixin):
         
         Args:
             parent: 父对象
+        Returns:
+            None
         """
         super().__init__(parent)
         
@@ -46,7 +48,11 @@ class MainWindow(MSFluentWindow, LoggerMixin):
         self._init_window()
         
     def _setup_window(self) -> None:
-        """设置窗口属性"""
+        """设置窗口属性
+        
+        Returns:
+            None
+        """
         self.setWindowTitle("雷达信号识别系统")
         self.resize(1200, 800)
         
@@ -54,7 +60,11 @@ class MainWindow(MSFluentWindow, LoggerMixin):
         self.setWindowIcon(FluentIcon.HOME.icon())
             
     def _init_navigation(self) -> None:
-        """初始化导航"""
+        """初始化导航
+        
+        Returns:
+            None
+        """
         # 创建子界面实例
         self.main_interface: MainInterface = MainInterface(text="main interface")
         self.radar_analysis_interface: RadarAnalysisInterface = RadarAnalysisInterface(text="radar analysis interface")
@@ -64,7 +74,6 @@ class MainWindow(MSFluentWindow, LoggerMixin):
         # 创建并配置设置控制器
         self.settings_controller: SettingsController = SettingsController(parent=self)
         self.settings_controller.set_settings_interface(settings_interface=self.settings_interface)
-        
         self.logger.info("设置控制器已初始化并连接到设置界面")
         
         # 添加导航项
@@ -97,7 +106,11 @@ class MainWindow(MSFluentWindow, LoggerMixin):
         )
         
     def _init_window(self) -> None:
-        """初始化窗口"""
+        """初始化窗口
+        
+        Returns:
+            None
+        """
         # 设置窗口居中
         desktop = QApplication.screens()[0].availableGeometry()
         w, h = desktop.width(), desktop.height()
