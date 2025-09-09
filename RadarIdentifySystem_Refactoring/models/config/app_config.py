@@ -50,4 +50,4 @@ _app_cfg = AppConfig()
 # 默认主题：跟随系统
 _app_cfg.themeMode.value = Theme.AUTO
 # 导入配置文件
-qconfig.load("/RadarIdentifySystem_Refactoring/app/config/config.json", _app_cfg)
+qconfig.load("app/config/config.json", _app_cfg)

@@ -1,0 +1,10 @@
+{
+    "MainWindow": {
+        "DpiScale": "Auto",
+        "MicaEnabled": true
+    },
+    "QFluentWidgets": {
+        "ThemeColor": "#ff5d67aa",
+        "ThemeMode": "Auto"
+    }
+}
