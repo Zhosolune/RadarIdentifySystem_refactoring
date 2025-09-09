@@ -1,11 +1,11 @@
 from typing import Optional
-from functools import wraps
 from PyQt6.QtCore import QObject
 from PyQt6.QtGui import QColor
 from qfluentwidgets import setTheme, setThemeColor
-from models.config.app_config import _app_cfg
 from views.interfaces.settings_interface import SettingsInterface
 from models.utils.log_manager import LoggerMixin
+from models.config.app_config import _app_cfg
+from models.utils.signal_bus import mw_signalBus
 
 
 class SettingsController(QObject, LoggerMixin):
@@ -89,8 +89,9 @@ class SettingsController(QObject, LoggerMixin):
             raise RuntimeError("设置界面在连接信号前必须先被创建")
 
         if hasattr(self._settings_interface, "themeColorCard") and hasattr(self._settings_interface.themeColorCard, "colorChanged"):
-            self._settings_interface.themeColorCard.colorChanged.connect(setThemeColor)
+            self._settings_interface.themeColorCard.colorChanged.connect(lambda c: setThemeColor(c))
             self._settings_interface.themeColorCard.colorChanged.connect(self._on_theme_color_changed)
+            self._settings_interface.micaCard.checkedChanged.connect(mw_signalBus.micaEnableChanged)
         else:
             self.logger.debug("未找到 themeColorCard 或其 colorChanged 信号；当前为配置驱动，跳过接线")
 

@@ -9,6 +9,8 @@ from views.interfaces.model_management_interface import ModelManagementInterface
 from views.interfaces.settings_interface import SettingsInterface
 from controllers.ui.settings_controller import SettingsController
 from models.utils.log_manager import LoggerMixin
+from models.config.app_config import _app_cfg
+from models.utils.signal_bus import mw_signalBus
 
 
 class MainWindow(MSFluentWindow, LoggerMixin):
@@ -42,10 +44,22 @@ class MainWindow(MSFluentWindow, LoggerMixin):
         
         # 设置窗口属性
         self._setup_window()
+
+        # 连接信号
+        self._connectSignalToSlot()
         
         # 初始化界面
         self._init_navigation()
         self._init_window()
+
+    def _connectSignalToSlot(self) -> None:
+        """连接窗口信号
+
+        Returns:
+            None
+        """
+
+        mw_signalBus.micaEnableChanged.connect(self.setMicaEffectEnabled)
         
     def _setup_window(self) -> None:
         """设置窗口属性
@@ -55,6 +69,8 @@ class MainWindow(MSFluentWindow, LoggerMixin):
         """
         self.setWindowTitle("雷达信号识别系统")
         self.resize(1200, 800)
+
+        self.setMicaEffectEnabled(_app_cfg.get(_app_cfg.micaEnabled))
         
         # 设置窗口图标
         self.setWindowIcon(FluentIcon.HOME.icon())
