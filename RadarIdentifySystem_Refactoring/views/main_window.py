@@ -1,8 +1,8 @@
-
+from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import QApplication
 from typing import Optional
 
-from qfluentwidgets import MSFluentWindow, NavigationItemPosition, FluentIcon
+from qfluentwidgets import MSFluentWindow, NavigationItemPosition, FluentIcon, SystemThemeListener, SplashScreen
 from views.interfaces.main_interface import MainInterface
 from views.interfaces.radar_analysis_interface import RadarAnalysisInterface
 from views.interfaces.model_management_interface import ModelManagementInterface
@@ -32,7 +32,8 @@ class MainWindow(MSFluentWindow, LoggerMixin):
             None
         """
         super().__init__(parent)
-        
+        self._init_window()
+
         # 创建子界面
         self.main_interface = None
         self.radar_analysis_interface = None
@@ -41,29 +42,17 @@ class MainWindow(MSFluentWindow, LoggerMixin):
         
         # 创建控制器
         self.settings_controller = None
-        
-        # 设置窗口属性
-        self._setup_window()
 
         # 连接信号
         self._connectSignalToSlot()
         
         # 初始化界面
         self._init_navigation()
-        self._init_window()
+        self.splashScreen.finish()
 
-    def _connectSignalToSlot(self) -> None:
-        """连接窗口信号
+    def _init_window(self) -> None:
+        """初始化窗口
 
-        Returns:
-            None
-        """
-
-        mw_signalBus.micaEnableChanged.connect(self.setMicaEffectEnabled)
-        
-    def _setup_window(self) -> None:
-        """设置窗口属性
-        
         Returns:
             None
         """
@@ -71,9 +60,19 @@ class MainWindow(MSFluentWindow, LoggerMixin):
         self.resize(1200, 800)
 
         self.setMicaEffectEnabled(_app_cfg.get(_app_cfg.micaEnabled))
-        
+
+        # create splash screen
+        self.splashScreen = SplashScreen(self.windowIcon(), self)
+        self.splashScreen.setIconSize(QSize(106, 106))
+        self.splashScreen.raise_()
+
         # 设置窗口图标
         self.setWindowIcon(FluentIcon.HOME.icon())
+        # 设置窗口居中
+        desktop = QApplication.screens()[0].availableGeometry()
+        w, h = desktop.width(), desktop.height()
+        self.move(w // 2 - self.width() // 2, h // 2 - self.height() // 2)
+        self.show()
             
     def _init_navigation(self) -> None:
         """初始化导航
@@ -120,18 +119,16 @@ class MainWindow(MSFluentWindow, LoggerMixin):
             text="设置", 
             position=NavigationItemPosition.BOTTOM
         )
-        
-    def _init_window(self) -> None:
-        """初始化窗口
-        
+
+    def _connectSignalToSlot(self) -> None:
+        """连接窗口信号
+
         Returns:
             None
         """
-        # 设置窗口居中
-        desktop = QApplication.screens()[0].availableGeometry()
-        w, h = desktop.width(), desktop.height()
-        self.move(w // 2 - self.width() // 2, h // 2 - self.height() // 2)
-            
+
+        mw_signalBus.micaEnableChanged.connect(self.setMicaEffectEnabled)
+             
     def get_main_interface(self) -> MainInterface:
         """获取主界面实例
         

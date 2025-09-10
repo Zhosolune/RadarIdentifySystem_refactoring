@@ -1,6 +1,6 @@
 # coding: utf-8
 from enum import Enum
-
+import os
 from qfluentwidgets import StyleSheetBase, Theme, qconfig
 
 
@@ -12,4 +12,6 @@ class StyleSheet(StyleSheetBase, Enum):
 
     def path(self, theme=Theme.AUTO):
         theme = qconfig.theme if theme == Theme.AUTO else theme
-        return f"views/base/qss/{theme.value.lower()}/{self.value}.qss"
+        # 获取项目根目录的绝对路径
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        return os.path.join(project_root, "views", "base", "qss", theme.value.lower(), f"{self.value}.qss")

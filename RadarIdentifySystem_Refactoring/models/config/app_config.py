@@ -1,3 +1,4 @@
+import os
 import sys
 import datetime
 
@@ -32,7 +33,7 @@ class AppConfig(QConfig):
 
     # 主窗口
     micaEnabled = ConfigItem("MainWindow", "MicaEnabled", isWin11(), BoolValidator())
-    dpiScale = OptionsConfigItem("MainWindow", "DpiScale", "Auto", OptionsValidator([1, 1.25, 1.5, 1.75, 2, "Auto"]), restart=True)
+    dpiScale = OptionsConfigItem("MainWindow", "DpiScale", "Auto", OptionsValidator([1, 1.25, 1.5, 1.75, 2, "Auto"]))
 
     def __init__(self):
         """初始化应用程序配置"""
@@ -50,4 +51,6 @@ _app_cfg = AppConfig()
 # 默认主题：跟随系统
 _app_cfg.themeMode.value = Theme.AUTO
 # 导入配置文件
-qconfig.load("app/config/config.json", _app_cfg)
+# 获取项目根目录的绝对路径
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+qconfig.load(os.path.join(project_root, "app/config/config.json"), _app_cfg)
