@@ -10,6 +10,7 @@ from pathlib import Path
 from loguru import logger
 from typing import Optional
 import threading
+from datetime import datetime
 
 
 class LogManager:
@@ -98,7 +99,9 @@ class LogManager:
             project_root = Path(__file__).parent.parent.parent
             log_dir = project_root / "logs"
             log_dir.mkdir(exist_ok=True)
-            self._log_file = log_dir / "app.log"
+            # 创建以当前时间命名的日志文件
+            current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+            self._log_file = log_dir / f"debug_{current_time}.log"
         else:
             self._log_file = Path(log_file)
             self._log_file.parent.mkdir(parents=True, exist_ok=True)
@@ -114,8 +117,8 @@ class LogManager:
             encoding="utf-8"
         )
         
-        # 添加错误日志文件handler
-        error_log_file = self._log_file.parent / "error.log"
+        # 添加错误日志文件handler（也使用时间戳命名）
+        error_log_file = self._log_file.parent / f"error_{current_time}.log"
         logger.add(
             sink=error_log_file,
             format=file_format,
