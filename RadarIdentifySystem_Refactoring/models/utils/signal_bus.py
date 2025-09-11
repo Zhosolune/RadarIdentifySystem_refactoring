@@ -14,12 +14,6 @@ class MainWindowSignalBus(QObject):
 
     # 设置信号
     settingInterfaceRestartSig = pyqtSignal()
-    
-    # 重启相关信号
-    restartRequested = pyqtSignal(str)  # 重启请求信号，携带重启原因
-    restartConfirmed = pyqtSignal()  # 用户确认重启信号
-    restartCancelled = pyqtSignal()  # 重启取消信号
-    countdownTick = pyqtSignal(int)  # 倒计时信号，携带剩余秒数
 
 
 # 创建信号总线实例

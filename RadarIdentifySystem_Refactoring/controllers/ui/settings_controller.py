@@ -140,56 +140,5 @@ class SettingsController(QObject, LoggerMixin):
             None
         """
         self.logger.info(f"DPI缩放已变更为: {value}，准备显示重启确认对话框")
-        self._show_restart_confirmation_dialog()
+        self._settings_interface.showRestartTooltip()
     
-    def _show_restart_confirmation_dialog(self) -> None:
-        """显示带倒计时的重启确认对话框
-        
-        通过settings_interface显示对话框，并启动倒计时定时器。
-        
-        Returns:
-            None
-        
-        Raises:
-            None
-        """
-        if self._settings_interface is None:
-            self.logger.warning("settings_interface未设置，无法显示重启确认对话框")
-            return
-        
-        self._countdown_seconds = 3
-        
-        # 通过View层显示对话框
-        self._settings_interface.show_restart_confirmation_dialog(countdown_seconds=self._countdown_seconds)
-        
-        # 设置倒计时定时器
-        self._countdown_timer = QTimer(self)
-        self._countdown_timer.timeout.connect(self._update_countdown)
-        self._countdown_timer.start(1000)  # 每秒更新一次
-        
-        self.logger.debug("重启确认对话框已显示，倒计时开始")
-    
-    def _update_countdown(self) -> None:
-        """更新倒计时显示
-        
-        每秒调用一次，更新对话框中的倒计时文本。
-        
-        Returns:
-            None
-        
-        Raises:
-            None
-        """
-        self._countdown_seconds -= 1
-        
-        if self._countdown_seconds > 0:
-            # 通过View层更新倒计时显示
-            if self._settings_interface is not None:
-                self._settings_interface.update_countdown_display(countdown_seconds=self._countdown_seconds)
-            mw_signalBus.countdownTick.emit(self._countdown_seconds)
-        else:
-            # 倒计时结束，自动关闭对话框
-            self._countdown_timer.stop()
-            if self._settings_interface is not None:
-                self._settings_interface.close_restart_dialog()
-            self.logger.info("倒计时结束，对话框自动关闭")

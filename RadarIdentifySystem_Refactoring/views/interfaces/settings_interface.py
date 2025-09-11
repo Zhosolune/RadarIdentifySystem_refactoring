@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QLabel
-from PyQt6.QtCore import Qt, pyqtSignal
+from PyQt6.QtCore import Qt
 from qfluentwidgets import (
     OptionsSettingCard,
     ExpandLayout,
@@ -10,6 +10,7 @@ from qfluentwidgets import (
     HyperlinkCard,
     PrimaryPushSettingCard,
     MessageBox,
+    InfoBar,
 )
 from qfluentwidgets import FluentIcon as FIF
 from typing import Optional
@@ -116,7 +117,6 @@ class SettingsInterface(ScrollArea, LoggerMixin):
 
         # 初始化布局
         self._initLayout()
-        # self.__connectSignalToSlot()
 
     def _initLayout(self):
         self.settingLabel.move(36, 30)
@@ -135,98 +135,7 @@ class SettingsInterface(ScrollArea, LoggerMixin):
         self.expandLayout.setContentsMargins(36, 10, 36, 0)
         self.expandLayout.addWidget(self.personalGroup)
         self.expandLayout.addWidget(self.aboutGroup)
-    
-    def show_restart_confirmation_dialog(self, countdown_seconds: int = 3) -> None:
-        """显示重启确认对话框
-        
-        Args:
-            countdown_seconds: 倒计时秒数，默认为3秒
-            
-        Returns:
-            None
-            
-        Raises:
-            None
-        """
-        if self._restart_dialog is not None:
-            self._restart_dialog.close()
-        
-        self._restart_dialog = MessageBox(
-            title="重启确认",
-            content=f"DPI设置已更改，需要重启应用生效。\n\n{countdown_seconds}秒后自动关闭",
-            parent=self
-        )
-        
-        # 设置对话框按钮
-        self._restart_dialog.yesButton.setText("立即重启")
-        self._restart_dialog.cancelButton.setText("取消")
-        
-        # 连接按钮信号
-        self._restart_dialog.yesButton.clicked.connect(self._on_restart_confirmed)
-        self._restart_dialog.cancelButton.clicked.connect(self._on_restart_cancelled)
-        
-        self._restart_dialog.show()
-        self.logger.debug("重启确认对话框已显示")
-    
-    def update_countdown_display(self, countdown_seconds: int) -> None:
-        """更新倒计时显示
-        
-        Args:
-            countdown_seconds: 剩余倒计时秒数
-            
-        Returns:
-            None
-            
-        Raises:
-            None
-        """
-        if self._restart_dialog is not None:
-            self._restart_dialog.contentLabel.setText(
-                f"DPI设置已更改，需要重启应用生效。\n\n{countdown_seconds}秒后自动关闭"
-            )
-    
-    def close_restart_dialog(self) -> None:
-        """关闭重启确认对话框
-        
-        Returns:
-            None
-            
-        Raises:
-            None
-        """
-        if self._restart_dialog is not None:
-            self._restart_dialog.close()
-            self._restart_dialog = None
-            self.logger.debug("重启确认对话框已关闭")
-    
-    def _on_restart_confirmed(self) -> None:
-        """用户确认重启的回调处理
-        
-        当用户点击"立即重启"按钮时触发。
-        
-        Returns:
-            None
-            
-        Raises:
-            None
-        """
-        self.logger.info("用户确认重启应用")
-        self.close_restart_dialog()
-        # 发射确认重启信号到信号总线
-        mw_signalBus.restartConfirmed.emit()
-    
-    def _on_restart_cancelled(self) -> None:
-        """用户取消重启的回调处理
-        
-        当用户点击"取消"按钮时触发。
-        
-        Returns:
-            None
-            
-        Raises:
-            None
-        """
-        self.logger.info("用户取消重启应用")
-        self.close_restart_dialog()
-        # 发射取消重启信号到信号总线
-        mw_signalBus.restartCancelled.emit()
+
+    def showRestartTooltip(self):
+        """唤起重启提示"""
+        InfoBar.success("修改成功", "配置将在重启后生效", duration=1500, parent=self)
