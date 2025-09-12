@@ -17,6 +17,7 @@ from typing import Optional
 from models.config.app_config import _app_cfg, AUTHOR, YEAR, HELP_URL, VERSION, isWin11
 from models.theme.style_sheet import StyleSheet
 from models.utils.log_manager import LoggerMixin
+from models.ui.dimensions import UIDimensions
 
 
 class SettingsInterface(ScrollArea, LoggerMixin):
@@ -34,6 +35,7 @@ class SettingsInterface(ScrollArea, LoggerMixin):
         """
         super().__init__(parent=parent)
         self.scrollWidget = QWidget()
+        self.scrollWidget.setMaximumWidth(UIDimensions.SCROLL_AREA_MAX_WIDTH_SETTING)
         self.expandLayout = ExpandLayout(self.scrollWidget)
 
         # 设置标签
@@ -104,6 +106,9 @@ class SettingsInterface(ScrollArea, LoggerMixin):
         self.setWidget(self.scrollWidget)
         self.setWidgetResizable(True)
         self.setObjectName("SettingsInterface")
+        
+        # 设置滚动区域居中对齐
+        self.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 
         # 初始化样式
         self.scrollWidget.setObjectName("scrollWidget")
