@@ -3,7 +3,7 @@ from qfluentwidgets import BodyLabel, LineEdit, setCustomStyleSheet
 from typing import Optional
 
 
-class ParameterConfigWidget(QWidget):
+class ParamsConfigWidget(QWidget):
     """参数配置框组件
     
     提供水平和垂直两种布局方式的参数配置框，包含参数标签、输入框和单位标签。

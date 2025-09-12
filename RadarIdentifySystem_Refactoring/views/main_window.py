@@ -2,15 +2,17 @@ from PyQt6.QtCore import QSize
 from PyQt6.QtWidgets import QApplication
 from typing import Optional
 
-from qfluentwidgets import MSFluentWindow, NavigationItemPosition, FluentIcon, SystemThemeListener, SplashScreen
+from qfluentwidgets import MSFluentWindow, NavigationItemPosition, FluentIcon, SplashScreen
 from views.interfaces.main_interface import MainInterface
 from views.interfaces.radar_analysis_interface import RadarAnalysisInterface
 from views.interfaces.model_management_interface import ModelManagementInterface
+from views.interfaces.params_config_interface import ParamsConfigInterface
 from views.interfaces.settings_interface import SettingsInterface
 from controllers.ui.settings_controller import SettingsController
 from models.utils.log_manager import LoggerMixin
-from models.config.app_config import _app_cfg
+from models.utils.icons_manager import Icon
 from models.utils.signal_bus import mw_signalBus
+from models.config.app_config import _app_cfg
 
 
 class MainWindow(MSFluentWindow, LoggerMixin):
@@ -39,6 +41,7 @@ class MainWindow(MSFluentWindow, LoggerMixin):
         self.radar_analysis_interface = None
         self.model_management_interface = None
         self.settings_interface = None
+        self.params_config_interface = None
         
         # 创建控制器
         self.settings_controller = None
@@ -80,11 +83,12 @@ class MainWindow(MSFluentWindow, LoggerMixin):
         Returns:
             None
         """
-        # 创建子界面实例
-        self.main_interface: MainInterface = MainInterface(text="main interface")
-        self.radar_analysis_interface: RadarAnalysisInterface = RadarAnalysisInterface(text="radar analysis interface")
-        self.model_management_interface: ModelManagementInterface = ModelManagementInterface(text="model management interface")
-        self.settings_interface: SettingsInterface = SettingsInterface(text="settings interface")
+        # 创建子界面实例（设置子页面唯一路由）
+        self.main_interface: MainInterface = MainInterface(self)  # MainInterface
+        self.radar_analysis_interface: RadarAnalysisInterface = RadarAnalysisInterface(self)  # RadarAnalysisInterface
+        self.model_management_interface: ModelManagementInterface = ModelManagementInterface(self)  # ModelManagementInterface
+        self.settings_interface: SettingsInterface = SettingsInterface(self)  # SettingsInterface
+        self.params_config_interface: ParamsConfigInterface = ParamsConfigInterface(self)  # ParamsConfigInterface
         
         # 创建并配置设置控制器
         self.settings_controller: SettingsController = SettingsController(parent=self)
@@ -114,11 +118,19 @@ class MainWindow(MSFluentWindow, LoggerMixin):
         )
         
         self.addSubInterface(
+            interface=self.params_config_interface,
+            icon=Icon.PARAMS_CONFIG, 
+            text="参数配置", 
+            position=NavigationItemPosition.BOTTOM
+        )
+
+        self.addSubInterface(
             interface=self.settings_interface, 
             icon=FluentIcon.SETTING, 
             text="设置", 
             position=NavigationItemPosition.BOTTOM
         )
+
 
     def _connectSignalToSlot(self) -> None:
         """连接窗口信号

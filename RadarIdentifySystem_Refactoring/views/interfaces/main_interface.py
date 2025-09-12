@@ -30,7 +30,7 @@ class MainInterface(QWidget):
         self.parameter_panel = None
         self.slice_panel = None
         self.cluster_panel = None
-        self.setObjectName(text.replace(" ", "-"))
+        self.setObjectName("MainInterface")
         
         # 设置UI
         self._setup_ui()

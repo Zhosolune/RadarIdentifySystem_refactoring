@@ -18,7 +18,7 @@ class ModelManagementInterface(QWidget):
         """
         super().__init__(parent)
 
-        self.setObjectName(text.replace(" ", "-"))
+        self.setObjectName("ModelManagementInterface")
         
         # 设置UI
         self._setup_ui()

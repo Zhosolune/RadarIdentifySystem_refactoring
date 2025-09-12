@@ -18,7 +18,7 @@ class RadarAnalysisInterface(QWidget):
         """
         super().__init__(parent)
 
-        self.setObjectName(text.replace(" ", "-"))
+        self.setObjectName("RadarAnalysisInterface")
         
         # 设置UI
         self._setup_ui()

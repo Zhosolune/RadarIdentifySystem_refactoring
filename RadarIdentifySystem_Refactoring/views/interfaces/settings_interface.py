@@ -17,7 +17,6 @@ from typing import Optional
 from models.config.app_config import _app_cfg, AUTHOR, YEAR, HELP_URL, VERSION, isWin11
 from models.theme.style_sheet import StyleSheet
 from models.utils.log_manager import LoggerMixin
-from models.utils.signal_bus import mw_signalBus
 
 
 class SettingsInterface(ScrollArea, LoggerMixin):
@@ -25,8 +24,6 @@ class SettingsInterface(ScrollArea, LoggerMixin):
 
     用于系统设置的界面，包含主题设置等功能。
     """
-    
-    # 注意：重启相关信号已移至信号总线 (models.utils.signal_bus.mw_signalBus)
 
     def __init__(self, text: str, parent: Optional[QWidget] = None):
         """初始化设置界面
@@ -106,7 +103,7 @@ class SettingsInterface(ScrollArea, LoggerMixin):
         self.setViewportMargins(0, 80, 0, 20)
         self.setWidget(self.scrollWidget)
         self.setWidgetResizable(True)
-        self.setObjectName("settingInterface")
+        self.setObjectName("SettingsInterface")
 
         # 初始化样式
         self.scrollWidget.setObjectName("scrollWidget")
