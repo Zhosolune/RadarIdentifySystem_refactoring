@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QLabel
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QResizeEvent
 from qfluentwidgets import (
     OptionsSettingCard,
     ExpandLayout,
@@ -120,8 +121,13 @@ class SettingsInterface(ScrollArea, LoggerMixin):
         # 初始化布局
         self._initLayout()
 
-    def _initLayout(self):
-        self.settingLabel.move(36, 30)
+    def _initLayout(self) -> None:
+        """初始化布局
+        
+        设置标签位置和卡片组布局。
+        """
+        # 初始化标签位置（相对定位）
+        self._updateLabelPosition()
 
         # 添加设置卡片到组
         self.personalGroup.addSettingCard(self.micaCard)
@@ -138,6 +144,39 @@ class SettingsInterface(ScrollArea, LoggerMixin):
         self.expandLayout.addWidget(self.personalGroup)
         self.expandLayout.addWidget(self.aboutGroup)
 
-    def showRestartTooltip(self):
+    def _updateLabelPosition(self) -> None:
+        """更新设置标签位置
+        
+        根据滚动区域的宽度动态调整标签位置，使其始终与滚动区域保持一致的对齐方式。
+        """
+        # 获取当前窗口宽度
+        window_width = self.width() if self.width() > 0 else UIDimensions.WINDOW_DEFAULT_WIDTH
+        
+        # 计算滚动区域的实际宽度（考虑最大宽度限制）
+        scroll_area_width = min(window_width, UIDimensions.SCROLL_AREA_MAX_WIDTH_SETTING)
+        
+        # 计算标签的水平位置（与滚动区域左边距保持一致）
+        # 滚动区域居中对齐，所以标签也应该相对于居中位置计算
+        center_offset = (window_width - scroll_area_width) // 2
+        label_x = max(center_offset + 36, 36)  # 确保最小边距为36px
+        
+        # 设置标签位置
+        self.settingLabel.move(label_x, 30)
+        
+        self.logger.debug(f"更新设置标签位置: x={label_x}, 窗口宽度={window_width}, 滚动区域宽度={scroll_area_width}")
+    
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        """窗口大小变化事件处理
+        
+        当窗口大小变化时，自动调整设置标签的位置。
+        
+        Args:
+            event: 窗口大小变化事件
+        """
+        super().resizeEvent(event)
+        # 更新标签位置以适应新的窗口大小
+        self._updateLabelPosition()
+
+    def showRestartTooltip(self) -> None:
         """唤起重启提示"""
         InfoBar.success("修改成功", "配置将在重启后生效", duration=1500, parent=self)
