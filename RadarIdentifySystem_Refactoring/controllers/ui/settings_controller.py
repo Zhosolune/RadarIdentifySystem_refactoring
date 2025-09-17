@@ -33,7 +33,7 @@ class SettingsController(QObject, LoggerMixin):
         """
         super().__init__(parent=parent)
             
-        self.settings_interface: SettingsInterface = settings_interface
+        self._settings_interface: SettingsInterface = settings_interface
         
         self.logger.info("正在初始化设置控制器")
         self._setup_app_connections()
@@ -59,9 +59,9 @@ class SettingsController(QObject, LoggerMixin):
     def _connect_interface_signals(self) -> None:
         """连接设置界面中与主题无关或后续可扩展的信号
 
-        - 连接 settings_interface.themeColorCard -> setThemeColor（由 PFW 生效整个主题色）；
-        - 连接 settings_interface.themeColorCard -> _on_theme_color_changed（仅记录日志）。
-        - 连接 settings_interface.micaCard -> mw_signalBus.micaEnableChanged（是否开启云母效果）。
+        - 连接 _settings_interface.themeColorCard -> setThemeColor（由 PFW 生效整个主题色）；
+        - 连接 _settings_interface.themeColorCard -> _on_theme_color_changed（仅记录日志）。
+        - 连接 _settings_interface.micaCard -> mw_signalBus.micaEnableChanged（是否开启云母效果）。
 
         Returns:
             None
@@ -71,15 +71,15 @@ class SettingsController(QObject, LoggerMixin):
         """
         try:
             # 连接主题色变化信号
-            self.settings_interface.themeColorCard.colorChanged.connect(lambda c: setThemeColor(c))
-            self.settings_interface.themeColorCard.colorChanged.connect(self._on_theme_color_changed)
+            self._settings_interface.themeColorCard.colorChanged.connect(lambda c: setThemeColor(c))
+            self._settings_interface.themeColorCard.colorChanged.connect(self._on_theme_color_changed)
             self.logger.debug("主题色卡片信号连接成功")
         except AttributeError as e:
             self.logger.debug(f"未找到 themeColorCard 或其 colorChanged 信号: {e}")
         
         try:
             # 连接云母效果开关信号
-            self.settings_interface.micaCard.checkedChanged.connect(mw_signalBus.micaEnableChanged)
+            self._settings_interface.micaCard.checkedChanged.connect(mw_signalBus.micaEnableChanged)
             self.logger.debug("云母效果卡片信号连接成功")
         except AttributeError as e:
             self.logger.debug(f"未找到 micaCard 或其 checkedChanged 信号: {e}")
@@ -125,5 +125,5 @@ class SettingsController(QObject, LoggerMixin):
             None
         """
         self.logger.info(f"DPI缩放已变更为: {value}，准备显示重启确认对话框")
-        self.settings_interface.showRestartTooltip()
+        self._settings_interface.showRestartTooltip()
     
