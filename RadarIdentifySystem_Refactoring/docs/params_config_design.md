@@ -119,26 +119,25 @@ params_config.clustering.reset_to_default()
 
 ```python
 from abc import ABC
-from typing import Dict, Any, Optional
-from PyQt6.QtCore import QObject, pyqtSignal
+from typing import Dict, Any
 import yaml
 
-class BaseParams(QObject, ABC):
+class BaseParams(ABC):
     """
-    参数类基类，提供参数数据管理的基础功能
+    参数类基类，提供参数数据管理的基础功能（Model层）
     
     职责：
     - 参数数据的存储和访问
     - YAML配置文件加载/保存
     - 参数默认值管理
     - 类型验证和转换
-    - 通过信号总线发射参数变更通知
     
-    注意：UI相关操作（组件注册、同步等）由Controller层负责
+    注意：
+    - 纯数据模型，不继承QObject，不处理信号
+    - UI组件注册、信号发射等由Controller层负责
     """
     
     def __init__(self):
-        super().__init__()
         self._default_values: Dict[str, Any] = {}
         self._load_defaults()
         self._load_user_config()
@@ -150,6 +149,8 @@ class BaseParams(QObject, ABC):
     def save_to_yaml(self) -> None:
         """保存用户配置到YAML文件"""
         pass
+    
+
 ```
 
 ### 2. 具体参数类
@@ -213,14 +214,22 @@ class PostprocessingParams(BaseParams):
 ### 3. 主参数配置类 (ParamsConfig)
 
 ```python
-class ParamsConfig(QObject):
+from typing import Optional
+from PyQt6.QtCore import QObject
+
+class ParamsConfig:
     """
-    参数配置管理主类（单例模式）
+    参数配置管理主类（Model层 - 单例模式）
     
     职责：
     - 管理所有算法参数类实例
     - 提供统一的参数访问接口
     - 处理全局参数操作（保存、重置等）
+    - 数据持久化管理
+    
+    注意：
+    - 纯数据管理，不处理UI组件注册
+    - UI相关操作由Controller层负责
     """
     
     _instance: Optional['ParamsConfig'] = None
@@ -233,7 +242,6 @@ class ParamsConfig(QObject):
     def __init__(self):
         if hasattr(self, '_initialized'):
             return
-        super().__init__()
         
         # 初始化各算法参数类
         self.clustering = ClusteringParams()
@@ -243,22 +251,19 @@ class ParamsConfig(QObject):
         
         self._initialized = True
     
-    def register_ui_component(self, param_path: str, ui_component: Any) -> None:
-        """注册UI组件与参数的绑定关系
-        
-        Args:
-            param_path: 参数路径，格式为"算法类.参数名"，如"clustering.EPS"
-            ui_component: UI组件实例
-        """
-        pass
-    
     def save_all_configs(self) -> None:
         """保存所有参数配置"""
-        pass
+        self.clustering.save_to_yaml()
+        self.identification.save_to_yaml()
+        self.preprocessing.save_to_yaml()
+        self.postprocessing.save_to_yaml()
     
     def reset_all_to_default(self) -> None:
         """重置所有参数到默认值"""
-        pass
+        self.clustering.reset_to_default()
+        self.identification.reset_to_default()
+        self.preprocessing.reset_to_default()
+        self.postprocessing.reset_to_default()
 
 # 创建全局实例
 params_config = ParamsConfig()
@@ -347,11 +352,24 @@ class ParamsConfigController(QObject):
 - **PyQt6-Fluent-Widgets组件**：SpinBox, DoubleSpinBox, LineEdit, ComboBox等
 - **自定义ParamsConfigWidget**：利用现有的get_input_text()和set_input_text()方法
 
-### 3. 自动同步机制
+### 自动同步机制
 
 ```python
-# 在ParamsConfig主类中实现统一的同步机制
-class ParamsConfig(QObject):
+# Controller层实现参数同步逻辑
+class ParamsConfigController(QObject):
+    """参数配置控制器（Controller层）
+    
+    职责：
+    - UI组件注册与参数绑定
+    - 参数变更信号处理
+    - UI与Model层的数据同步
+    - 业务流程协调
+    """
+    
+    def __init__(self, params_config: ParamsConfig):
+        super().__init__()
+        self.params_config = params_config
+    
     def register_ui_component(self, param_path: str, ui_component: Any) -> None:
         """注册UI组件与参数的绑定关系
         
@@ -364,7 +382,29 @@ class ParamsConfig(QObject):
             ui_component.valueChanged.connect(
                 lambda value: self._update_param_value(param_path, value)
             )
+    
+    def _update_param_value(self, param_path: str, new_value: Any) -> None:
+        """更新参数值并发射信号（Controller层职责）
         
+        Args:
+            param_path: 参数路径，格式为"算法类.参数名"，如"clustering.EPS"
+            new_value: 新的参数值
+        
+        功能：
+            1. 立刻修改参数配置器实例中对应参数的值
+            2. 保存到用户参数配置.yaml文件
+            3. 发射信号通知其他组件参数已变更
+        """
+        # 1. 立刻修改参数配置器实例中对应参数的值（直接属性访问）
+        algorithm, param_name = param_path.split('.')
+        param_class = getattr(self.params_config, algorithm)
+        setattr(param_class, param_name, new_value)
+        
+        # 2. 保存到用户参数配置.yaml文件（调用Model层）
+        param_class.save_to_yaml()
+        
+        # 3. 发射信号通知其他组件参数已变更（Controller层职责）
+        pc_signalBus.paramChanged.emit(param_path, new_value)
 ```
 
 ## 信号通知机制
@@ -374,11 +414,11 @@ class ParamsConfig(QObject):
 参数配置系统使用专门的信号总线进行信号管理，遵循项目统一的信号总线架构：
 
 ```python
-from models.utils.signal_bus import pc_signalBus
+# Model层 - 信号总线定义
+from PyQt6.QtCore import QObject, pyqtSignal
 
-# 参数配置信号总线使用方式
 class ParamsConfigSignalBus(QObject):
-    """参数配置信号总线类
+    """参数配置信号总线类（Model层）
     
     用于管理应用程序中的参数配置类的全局信号，实现组件间的解耦通信。
     """
@@ -392,33 +432,24 @@ pc_signalBus = ParamsConfigSignalBus()
 ### 信号连接示例
 
 ```python
-# 使用参数配置信号总线进行信号连接
+# Controller层 - 信号连接和处理
 from models.utils.signal_bus import pc_signalBus
 
-# 连接参数变更信号
-pc_signalBus.paramChanged.connect(on_param_changed)
-
-# 在参数类中发射信号
-def _update_param_value(self, param_name: str, new_value: Any) -> None:
-    """更新参数值并发射信号
+class ParamsConfigController(QObject):
+    def __init__(self):
+        super().__init__()
+        # 连接参数变更信号
+        pc_signalBus.paramChanged.connect(self.on_param_changed)
     
-    Args:
-        param_name: 参数名称，格式为"算法类.参数名"，如"clustering.EPS"
-        new_value: 新的参数值
-    
-    功能：
-        1. 立刻修改参数配置器实例中对应参数的值
-        2. 保存到用户参数配置.yaml文件
-        3. 发射信号通知其他组件参数已变更
-    """
-    # 1. 立刻修改参数配置器实例中对应参数的值
-    setattr(self, param_name, new_value)
-    
-    # 2. 保存到用户参数配置.yaml文件
-    self.save_to_yaml()
-    
-    # 3. 发射信号通知其他组件参数已变更
-    pc_signalBus.paramChanged.emit(param_name, new_value)
+    def on_param_changed(self, param_name: str, new_value: Any) -> None:
+        """处理参数变更信号
+        
+        Args:
+            param_name: 参数名称
+            new_value: 新的参数值
+        """
+        # 更新UI显示、通知其他模块等
+        pass
 ```
 
 ### 信号总线优势
@@ -447,6 +478,33 @@ app/config/params_config/
 ├── default_params.yaml         # 系统默认参数
 └── user_params.yaml           # 用户配置参数
 ```
+
+### MVC架构层次说明
+
+#### Model层（models/config/）
+- **职责**：纯数据模型，参数存储、验证、持久化
+- **组件**：
+  - `BaseParams`：参数基类，提供基础的参数操作方法
+  - `ParamsConfig`：参数配置主类，管理所有算法参数
+  - 各算法参数类：具体的参数定义和验证逻辑
+  - 信号总线定义：参数变更信号的定义
+
+#### Controller层（controllers/）
+- **职责**：业务逻辑控制，UI与Model的桥梁
+- **组件**：
+  - `ParamsConfigController`：参数配置控制器
+    - UI组件注册与参数绑定
+    - 参数变更信号处理和发射
+    - UI与Model层的数据同步
+    - 业务流程协调
+
+#### View层（views/）
+- **职责**：用户界面展示和交互
+- **组件**：
+  - `ParamsConfigInterface`：参数配置界面
+    - 参数输入组件展示
+    - 用户交互处理
+    - 界面状态更新
 
 ### 使用示例
 
