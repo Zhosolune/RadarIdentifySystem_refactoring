@@ -316,21 +316,14 @@ postprocessing:
 
 ### 1. 组件注册方式
 
-#### 方式一：装饰器注册
-```python
-@bind_param("clustering.eps")
-def setup_eps_widget(self) -> ParamsConfigWidget:
-    widget = ParamsConfigWidget()
-    widget.set_label_text("EPS参数")
-    return widget
-```
-
-#### 方式二：显式注册
+#### 显式注册（推荐方式）
 ```python
 def setup_ui(self):
     eps_widget = ParamsConfigWidget()
     params_config.clustering.register_widget("eps", eps_widget)
 ```
+
+> **注意**：采用显式注册方式，代码更清晰，便于维护和调试。
 
 ### 2. 支持的组件类型
 
@@ -371,7 +364,7 @@ params_config.config_saved.connect(on_config_saved)
 
 ```
 models/config/
-├── params_config/
+├── params_bases/
 │   ├── __init__.py
 │   ├── base_params.py          # BaseParams基类
 │   ├── clustering_params.py    # ClusteringParams
@@ -405,39 +398,116 @@ _params_manager.reset_to_defaults()  # ✓ 允许
 
 ### UI集成机制
 
-#### 组件注册与同步
-```python
-from xxx.xxx.xxx import _params_manager
+> **架构说明**：根据MVC架构原则，UI组件注册和信号连接等业务逻辑应放在**Controllers层**，Models层只提供数据管理接口，Views层只负责UI展示。
 
-class SettingsInterface(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.setup_ui()
+#### 组件注册与同步（Controllers层实现）
+
+##### 1. 参数配置控制器实现
+```python
+from models.config.params_config import _params_manager
+from typing import Optional
+
+class ParamsConfigController:
+    """参数配置界面控制器 - 负责UI组件注册和数据同步业务逻辑"""
+    
+    def __init__(self, parent: Optional[object] = None):
+        """初始化参数配置控制器
+        
+        Args:
+            parent: 父对象，通常是MainWindow
+        """
+        self.parent = parent
+        self.view: Optional[ParamsConfigInterface] = None
+    
+    def set_params_config_interface(self, params_config_interface: 'ParamsConfigInterface') -> None:
+        """设置参数配置界面并注册组件
+        
+        Args:
+            params_config_interface: 参数配置界面实例
+        """
+        self.view = params_config_interface
         self.register_components()
     
-    def setup_ui(self):
-        # 创建UI组件
-        self.threshold_spinbox = DoubleSpinBox()
-        self.min_points_spinbox = SpinBox()
-        
-    def register_components(self):
-        # 注册UI组件，实现自动双向同步
+    def register_components(self) -> None:
+        """注册UI组件，实现自动双向同步"""
+        if not self.view:
+            return
+            
+        # 注册UI组件到参数管理器
         _params_manager.register_ui_component(
             param_path="identification.THRESHOLD",
-            ui_component=self.threshold_spinbox
+            ui_component=self.view.threshold_spinbox
         )
         _params_manager.register_ui_component(
             param_path="clustering.MIN_POINTS", 
-            ui_component=self.min_points_spinbox
+            ui_component=self.view.min_points_spinbox
+        )
+        _params_manager.register_ui_component(
+            param_path="clustering.EPS", 
+            ui_component=self.view.eps_spinbox
         )
         
         # 初始化UI值
         self._sync_ui_from_params()
     
-    def _sync_ui_from_params(self):
+    def _sync_ui_from_params(self) -> None:
         """从参数管理器同步值到UI组件"""
-        self.threshold_spinbox.setValue(_params_manager.identification.THRESHOLD)
-        self.min_points_spinbox.setValue(_params_manager.clustering.MIN_POINTS)
+        if not self.view:
+            return
+            
+        self.view.threshold_spinbox.setValue(_params_manager.identification.THRESHOLD)
+        self.view.min_points_spinbox.setValue(_params_manager.clustering.MIN_POINTS)
+        self.view.eps_spinbox.setValue(_params_manager.clustering.EPS)
+```
+
+##### 2. 参数配置界面实现
+```python
+from qfluentwidgets import ScrollArea, DoubleSpinBox, SpinBox
+from typing import Optional
+
+class ParamsConfigInterface(ScrollArea):
+    """参数配置界面视图 - 只负责UI展示"""
+    
+    def __init__(self, parent: Optional[object] = None):
+        """初始化参数配置界面
+        
+        Args:
+            parent: 父对象
+        """
+        super().__init__(parent)
+        self.setup_ui()
+    
+    def setup_ui(self) -> None:
+        """创建UI组件"""
+        # 创建参数配置组件
+        self.threshold_spinbox = DoubleSpinBox()
+        self.min_points_spinbox = SpinBox()
+        self.eps_spinbox = DoubleSpinBox()
+        
+        # 设置组件属性
+        self.threshold_spinbox.setRange(0.0, 1.0)
+        self.threshold_spinbox.setSingleStep(0.01)
+        
+        self.min_points_spinbox.setRange(1, 100)
+        
+        self.eps_spinbox.setRange(0.0, 10.0)
+        self.eps_spinbox.setSingleStep(0.1)
+```
+
+##### 3. 主窗口中的控制器创建和连接
+```python
+# 在MainWindow的_init_navigation方法中
+class MainWindow(MSFluentWindow, LoggerMixin):
+    def _init_navigation(self) -> None:
+        # 创建界面实例
+        self.params_config_interface: ParamsConfigInterface = ParamsConfigInterface(self)
+        
+        # 创建并配置参数配置控制器
+        self.params_config_controller: ParamsConfigController = ParamsConfigController(parent=self)
+        self.params_config_controller.set_params_config_interface(
+            params_config_interface=self.params_config_interface
+        )
+        self.logger.info("参数配置控制器已初始化并连接到参数配置界面")
 ```
 
 #### 自动同步机制
