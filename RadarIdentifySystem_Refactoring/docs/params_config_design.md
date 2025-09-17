@@ -125,36 +125,23 @@ import yaml
 
 class BaseParams(QObject, ABC):
     """
-    参数类基类，提供参数管理的基础功能
+    参数类基类，提供参数数据管理的基础功能
     
-    功能：
+    职责：
+    - 参数数据的存储和访问
     - YAML配置文件加载/保存
-    - UI组件注册和同步
-    - 参数变更信号通知
+    - 参数默认值管理
     - 类型验证和转换
-    """
+    - 通过信号总线发射参数变更通知
     
-    # 参数变更信号
-    param_changed = pyqtSignal(str, object)  # (param_name, new_value)
+    注意：UI相关操作（组件注册、同步等）由Controller层负责
+    """
     
     def __init__(self):
         super().__init__()
-        self._widgets: Dict[str, Any] = {}
         self._default_values: Dict[str, Any] = {}
         self._load_defaults()
         self._load_user_config()
-    
-    def register_widget(self, param_name: str, widget: Any) -> None:
-        """注册UI组件与参数的绑定关系"""
-        pass
-    
-    def sync_from_ui(self) -> None:
-        """从UI组件同步参数值"""
-        pass
-    
-    def sync_to_ui(self) -> None:
-        """同步参数值到UI组件"""
-        pass
     
     def reset_to_default(self) -> None:
         """重置所有参数到默认值"""
@@ -171,41 +158,56 @@ class BaseParams(QObject, ABC):
 class ClusteringParams(BaseParams):
     """聚类算法参数类"""
     
+    # 参数声明区域 - 必须先声明参数成员
+    EPS: float
+    MIN_SAMPLES: int
+    ALGORITHM: str
+    METRIC: str
+    
     def __init__(self):
         super().__init__()
-        # 参数定义（类型注解确保类型安全）
-        self.EPS: float = 0.5
-        self.MIN_SAMPLES: int = 5
-        self.ALGORITHM: str = "auto"
-        self.METRIC: str = "euclidean"
+        # 初始化区域 - 通过配置文件填充参数值
+        self._load_params()
 
 class IdentificationParams(BaseParams):
     """识别算法参数类"""
     
+    # 参数声明区域 - 必须先声明参数成员
+    THRESHOLD: float
+    MODEL_PATH: str
+    CONFIDENCE_LEVEL: float
+    MAX_DETECTION_RANGE: float
+    
     def __init__(self):
         super().__init__()
-        self.THRESHOLD: float = 0.8
-        self.MODEL_PATH: str = "resources/models/radar_model.h5"
-        self.CONFIDENCE_LEVEL: float = 0.95
-        self.MAX_DETECTION_RANGE: float = 1000.0
+        # 初始化区域 - 通过配置文件填充参数值
+        self._load_params()
 
 class PreprocessingParams(BaseParams):
     """预处理参数类"""
     
+    # 参数声明区域 - 必须先声明参数成员
+    FILTER_SIZE: int
+    NOISE_THRESHOLD: float
+    SMOOTHING_FACTOR: float
+    
     def __init__(self):
         super().__init__()
-        self.FILTER_SIZE: int = 3
-        self.NOISE_THRESHOLD: float = 0.1
-        self.SMOOTHING_FACTOR: float = 0.5
+        # 初始化区域 - 通过配置文件填充参数值
+        self._load_params()
 
 class PostprocessingParams(BaseParams):
     """后处理参数类"""
     
+    # 参数声明区域 - 必须先声明参数成员
+    OUTPUT_FORMAT: str
+    RESULT_PRECISION: int
+    ENABLE_VALIDATION: bool
+    
     def __init__(self):
         super().__init__()
-        self.OUTPUT_FORMAT: str = "json"
-        self.RESULT_PRECISION: int = 4
-        self.ENABLE_VALIDATION: bool = True
+        # 初始化区域 - 通过配置文件填充参数值
+        self._load_params()
 ```
 
 ### 3. 主参数配置类 (ParamsConfig)
@@ -241,16 +243,21 @@ class ParamsConfig(QObject):
         
         self._initialized = True
     
+    def register_ui_component(self, param_path: str, ui_component: Any) -> None:
+        """注册UI组件与参数的绑定关系
+        
+        Args:
+            param_path: 参数路径，格式为"算法类.参数名"，如"clustering.EPS"
+            ui_component: UI组件实例
+        """
+        pass
+    
     def save_all_configs(self) -> None:
         """保存所有参数配置"""
         pass
     
     def reset_all_to_default(self) -> None:
         """重置所有参数到默认值"""
-        pass
-    
-    def register_ui_components(self, component_mappings: Dict[str, Any]) -> None:
-        """批量注册UI组件"""
         pass
 
 # 创建全局实例
@@ -316,14 +323,24 @@ postprocessing:
 
 ### 1. 组件注册方式
 
-#### 显式注册（推荐方式）
+#### 统一注册方式（推荐）
 ```python
-def setup_ui(self):
-    eps_widget = ParamsConfigWidget()
-    params_config.clustering.register_widget("eps", eps_widget)
+# 在Controller层进行UI组件注册
+class ParamsConfigController(QObject):
+    def register_components(self) -> None:
+        """注册UI组件，实现自动双向同步"""
+        # 使用ParamsConfig主类的register_ui_component方法
+        params_config.register_ui_component(
+            param_path="clustering.EPS",
+            ui_component=self.params_config_interface.eps_widget
+        )
+        params_config.register_ui_component(
+            param_path="identification.THRESHOLD", 
+            ui_component=self.params_config_interface.threshold_widget
+        )
 ```
 
-> **注意**：采用显式注册方式，代码更清晰，便于维护和调试。
+> **注意**：统一使用ParamsConfig.register_ui_component方法，在Controller层进行注册，符合MVC架构原则。
 
 ### 2. 支持的组件类型
 
@@ -333,32 +350,85 @@ def setup_ui(self):
 ### 3. 自动同步机制
 
 ```python
-# UI组件值变更时自动更新参数
-widget.valueChanged.connect(lambda value: setattr(params_config.clustering, 'EPS', value))
-
-# 参数变更时自动更新UI组件
-params_config.clustering.param_changed.connect(widget.setValue)
+# 在ParamsConfig主类中实现统一的同步机制
+class ParamsConfig(QObject):
+    def register_ui_component(self, param_path: str, ui_component: Any) -> None:
+        """注册UI组件与参数的绑定关系
+        
+        Args:
+            param_path: 参数路径，格式为"算法类.参数名"，如"clustering.EPS"
+            ui_component: UI组件实例
+        """
+        # UI组件值变更时自动更新参数
+        if hasattr(ui_component, 'valueChanged'):
+            ui_component.valueChanged.connect(
+                lambda value: self._update_param_value(param_path, value)
+            )
+        
 ```
 
 ## 信号通知机制
 
-### 参数级信号
-```python
-# 单个参数变更信号
-params_config.clustering.param_changed.connect(on_clustering_param_changed)
+### 信号总线集成
 
-# 特定参数变更信号
-params_config.clustering.eps_changed.connect(on_eps_changed)
+参数配置系统使用专门的信号总线进行信号管理，遵循项目统一的信号总线架构：
+
+```python
+from models.utils.signal_bus import pc_signalBus
+
+# 参数配置信号总线使用方式
+class ParamsConfigSignalBus(QObject):
+    """参数配置信号总线类
+    
+    用于管理应用程序中的参数配置类的全局信号，实现组件间的解耦通信。
+    """
+    
+    # 参数配置信号
+    paramChanged = pyqtSignal(str, object)  # (param_name, new_value)
+
+pc_signalBus = ParamsConfigSignalBus()
 ```
 
-### 全局信号
-```python
-# 任意参数变更信号
-params_config.any_param_changed.connect(on_any_param_changed)
+### 信号连接示例
 
-# 配置保存信号
-params_config.config_saved.connect(on_config_saved)
+```python
+# 使用参数配置信号总线进行信号连接
+from models.utils.signal_bus import pc_signalBus
+
+# 连接参数变更信号
+pc_signalBus.paramChanged.connect(on_param_changed)
+
+# 在参数类中发射信号
+def _update_param_value(self, param_name: str, new_value: Any) -> None:
+    """更新参数值并发射信号
+    
+    Args:
+        param_name: 参数名称，格式为"算法类.参数名"，如"clustering.EPS"
+        new_value: 新的参数值
+    
+    功能：
+        1. 立刻修改参数配置器实例中对应参数的值
+        2. 保存到用户参数配置.yaml文件
+        3. 发射信号通知其他组件参数已变更
+    """
+    # 1. 立刻修改参数配置器实例中对应参数的值
+    setattr(self, param_name, new_value)
+    
+    # 2. 保存到用户参数配置.yaml文件
+    self.save_to_yaml()
+    
+    # 3. 发射信号通知其他组件参数已变更
+    pc_signalBus.paramChanged.emit(param_name, new_value)
 ```
+
+### 信号总线优势
+
+1. **统一管理**：所有参数配置相关信号集中在ParamsConfigSignalBus中
+2. **解耦通信**：组件间通过信号总线进行通信，降低耦合度
+3. **架构一致性**：与项目中其他信号总线（如MainWindowSignalBus）保持一致的使用方式
+4. **易于维护**：信号定义集中，便于管理和扩展
+
+> **注意**：具体的信号总线使用规范请参考项目的信号总线使用指导文档。
 
 ## 文件组织结构
 
@@ -383,17 +453,17 @@ app/config/params_config/
 #### 基本使用
 ```python
 # 参数访问（只读）
-threshold = _params_manager.identification.THRESHOLD  # ✓ 允许
-min_points = _params_manager.clustering.MIN_POINTS   # ✓ 允许
+threshold = _params_cfg.identification.THRESHOLD  # ✓ 允许
+min_points = _params_cfg.clustering.MIN_POINTS   # ✓ 允许
 
 # 禁止直接赋值修改
-# _params_manager.identification.THRESHOLD = 0.8     # ✗ 禁止
+# _params_cfg.identification.THRESHOLD = 0.8     # ✗ 禁止
 
 # 通过UI组件修改（自动同步到配置文件）
 # UI修改会触发自动保存到用户配置文件
 
 # 重置到默认值
-_params_manager.reset_to_defaults()  # ✓ 允许
+_params_cfg.reset_to_defaults()  # ✓ 允许
 ```
 
 ### UI集成机制
@@ -404,47 +474,41 @@ _params_manager.reset_to_defaults()  # ✓ 允许
 
 ##### 1. 参数配置控制器实现
 ```python
-from models.config.params_config import _params_manager
+from models.config.params_config import _params_cfg
 from typing import Optional
 
-class ParamsConfigController:
+class ParamsConfigController(QObject, LoggerMixin):
     """参数配置界面控制器 - 负责UI组件注册和数据同步业务逻辑"""
     
-    def __init__(self, parent: Optional[object] = None):
+    def __init__(self, params_config_interface: 'ParamsConfigInterface', parent: Optional[QObject] = None) -> None:
         """初始化参数配置控制器
         
         Args:
+            params_config_interface: 参数配置界面实例
             parent: 父对象，通常是MainWindow
         """
-        self.parent = parent
-        self.view: Optional[ParamsConfigInterface] = None
-    
-    def set_params_config_interface(self, params_config_interface: 'ParamsConfigInterface') -> None:
-        """设置参数配置界面并注册组件
-        
-        Args:
-            params_config_interface: 参数配置界面实例
-        """
-        self.view = params_config_interface
+        super().__init__(parent=parent)
+        self.params_config_interface: ParamsConfigInterface = params_config_interface
+
         self.register_components()
     
     def register_components(self) -> None:
         """注册UI组件，实现自动双向同步"""
-        if not self.view:
+        if not self.params_config_interface:
             return
             
         # 注册UI组件到参数管理器
-        _params_manager.register_ui_component(
+        _params_cfg.register_ui_component(
             param_path="identification.THRESHOLD",
-            ui_component=self.view.threshold_spinbox
+            ui_component=self.params_config_interface.threshold_spinbox
         )
-        _params_manager.register_ui_component(
+        _params_cfg.register_ui_component(
             param_path="clustering.MIN_POINTS", 
-            ui_component=self.view.min_points_spinbox
+            ui_component=self.params_config_interface.min_points_spinbox
         )
-        _params_manager.register_ui_component(
+        _params_cfg.register_ui_component(
             param_path="clustering.EPS", 
-            ui_component=self.view.eps_spinbox
+            ui_component=self.params_config_interface.eps_spinbox
         )
         
         # 初始化UI值
@@ -452,12 +516,12 @@ class ParamsConfigController:
     
     def _sync_ui_from_params(self) -> None:
         """从参数管理器同步值到UI组件"""
-        if not self.view:
+        if not self.params_config_interface:
             return
             
-        self.view.threshold_spinbox.setValue(_params_manager.identification.THRESHOLD)
-        self.view.min_points_spinbox.setValue(_params_manager.clustering.MIN_POINTS)
-        self.view.eps_spinbox.setValue(_params_manager.clustering.EPS)
+        self.params_config_interface.threshold_spinbox.setValue(_params_cfg.identification.THRESHOLD)
+        self.params_config_interface.min_points_spinbox.setValue(_params_cfg.clustering.MIN_POINTS)
+        self.params_config_interface.eps_spinbox.setValue(_params_cfg.clustering.EPS)   
 ```
 
 ##### 2. 参数配置界面实现
@@ -503,10 +567,9 @@ class MainWindow(MSFluentWindow, LoggerMixin):
         self.params_config_interface: ParamsConfigInterface = ParamsConfigInterface(self)
         
         # 创建并配置参数配置控制器
-        self.params_config_controller: ParamsConfigController = ParamsConfigController(parent=self)
-        self.params_config_controller.set_params_config_interface(
-            params_config_interface=self.params_config_interface
-        )
+        self.params_config_controller: ParamsConfigController = ParamsConfigController(
+            params_config_interface=self.params_config_interface, 
+            parent=self)
         self.logger.info("参数配置控制器已初始化并连接到参数配置界面")
 ```
 
