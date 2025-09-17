@@ -90,10 +90,12 @@ class MainWindow(MSFluentWindow, LoggerMixin):
         self.settings_interface: SettingsInterface = SettingsInterface(self)  # SettingsInterface
         self.params_config_interface: ParamsConfigInterface = ParamsConfigInterface(self)  # ParamsConfigInterface
         
-        # 创建并配置设置控制器
-        self.settings_controller: SettingsController = SettingsController(parent=self)
-        self.settings_controller.set_settings_interface(settings_interface=self.settings_interface)
-        self.logger.info("设置控制器已初始化并连接到设置界面")
+        # 创建并配置设置控制器（依赖注入）
+        self.settings_controller: SettingsController = SettingsController(
+            settings_interface=self.settings_interface, 
+            parent=self
+        )
+        self.logger.info("创建设置控制器")
         
         # 添加导航项
         self.addSubInterface(

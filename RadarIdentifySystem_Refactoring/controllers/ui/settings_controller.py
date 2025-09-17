@@ -15,29 +15,30 @@ class SettingsController(QObject, LoggerMixin):
     现采用“配置驱动”的主题刷新策略：
     - 直接监听 _app_cfg.themeChanged / themeColorChanged；
     - 仅在回调里记录日志，不再显式调用 setThemeColor；
-    - SettingsInterface 的注入保持为可选（用于未来扩展/其他设置项的信号接线），但主题色不依赖它。
+    - 通过构造函数直接注入 SettingsInterface，确保控制器创建时就是完整可用的状态。
     """
     
-    def __init__(self, parent: Optional[QObject] = None) -> None:
+    def __init__(self, settings_interface: SettingsInterface, parent: Optional[QObject] = None) -> None:
         """初始化设置控制器
         
         Args:
+            settings_interface (SettingsInterface): 设置界面实例
             parent (Optional[QObject]): 父对象，用于Qt对象树管理
         
         Returns:
             None
         
         Raises:
-            None
+            ValueError: 当传入的设置界面为 None 时
         """
         super().__init__(parent=parent)
-        self._settings_interface: Optional[SettingsInterface] = None
-        self._countdown_timer: Optional[QTimer] = None
-        self._countdown_seconds: int = 3
+            
+        self._settings_interface: SettingsInterface = settings_interface
         
         self.logger.info("正在初始化设置控制器")
         self._setup_app_connections()
-        self.logger.info("设置控制器初始化成功")
+        self._connect_interface_signals()
+        self.logger.info("设置控制器初始化成功，界面信号已连接")
     
     def _setup_app_connections(self) -> None:
         """设置全局信号连接
@@ -55,43 +56,19 @@ class SettingsController(QObject, LoggerMixin):
         _app_cfg.dpiScale.valueChanged.connect(self._on_dpi_scale_changed)
         self.logger.info("全局主题和DPI信号连接已建立")
 
-    def set_settings_interface(self, settings_interface: SettingsInterface) -> None:
-        """设置关联的设置界面实例
-
-        Args:
-            settings_interface (SettingsInterface): 设置界面实例
-
-        Returns:
-            None
-
-        Raises:
-            ValueError: 当传入的设置界面为 None 时
-        """
-        if settings_interface is None:
-            self.logger.error("尝试设置空的设置界面")
-            raise ValueError("Settings interface cannot be None")
-
-        self._settings_interface = settings_interface
-        self.logger.debug("设置界面已注入")
-        self._connect_interface_signals()
-        self.logger.info("设置界面信号连接完成")
-        
     def _connect_interface_signals(self) -> None:
         """连接设置界面中与主题无关或后续可扩展的信号
 
         - 连接 _settings_interface.themeColorCard -> setThemeColor（由 PFW 生效整个主题色）；
         - 连接 _settings_interface.themeColorCard -> _on_theme_color_changed（仅记录日志）。
+        - 连接 _settings_interface.micaCard -> mw_signalBus.micaEnableChanged（是否开启云母效果）。
 
         Returns:
             None
 
         Raises:
-            RuntimeError: 当设置界面未设置时抛出
+            None
         """
-        if self._settings_interface is None:
-            self.logger.error("尝试在未设置设置界面的情况下连接信号")
-            raise RuntimeError("设置界面在连接信号前必须先被创建")
-
         if hasattr(self._settings_interface, "themeColorCard") and hasattr(self._settings_interface.themeColorCard, "colorChanged"):
             self._settings_interface.themeColorCard.colorChanged.connect(lambda c: setThemeColor(c))
             self._settings_interface.themeColorCard.colorChanged.connect(self._on_theme_color_changed)
