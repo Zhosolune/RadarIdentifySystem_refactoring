@@ -53,4 +53,4 @@ _app_cfg.themeMode.value = Theme.AUTO
 # 导入配置文件
 # 获取项目根目录的绝对路径
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-qconfig.load(os.path.join(project_root, "app/config/config.json"), _app_cfg)
+qconfig.load(os.path.join(project_root, "app/config/app_config/config.json"), _app_cfg)
