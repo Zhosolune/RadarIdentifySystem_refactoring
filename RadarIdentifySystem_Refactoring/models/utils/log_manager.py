@@ -118,16 +118,16 @@ class LogManager:
         )
         
         # 添加错误日志文件handler（也使用时间戳命名）
-        error_log_file = self._log_file.parent / f"error_{current_time}.log"
-        logger.add(
-            sink=error_log_file,
-            format=file_format,
-            level="ERROR",
-            rotation="10 MB",
-            retention="30 days",
-            compression="zip",
-            encoding="utf-8"
-        )
+        # error_log_file = self._log_file.parent / f"error_{current_time}.log"
+        # logger.add(
+        #     sink=error_log_file,
+        #     format=file_format,
+        #     level="ERROR",
+        #     rotation="10 MB",
+        #     retention="30 days",
+        #     compression="zip",
+        #     encoding="utf-8"
+        # )
         
         self._initialized = True
         logger.info(f"日志系统初始化完成，级别: {self._log_level}，文件: {self._log_file}")
@@ -168,8 +168,44 @@ class LogManager:
         if level.upper() not in valid_levels:
             raise ValueError(f"无效的日志级别: {level}，有效级别: {valid_levels}")
         
+        old_level = self._log_level
         self._log_level = level.upper()
-        logger.info(f"日志级别已更新为: {self._log_level}")
+        
+        # 重新配置所有handler的级别
+        # 移除现有的handlers
+        logger.remove()
+        
+        # 重新添加handlers with new level
+        console_format = (
+            "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
+            "<level>{level: <8}</level> | "
+            "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
+            "<level>{message}</level>"
+        )
+        
+        file_format = "{time:YYYY-MM-DD HH:mm:ss} | {level: <8} | {name}:{function}:{line} - {message}"
+        
+        # 添加控制台handler
+        logger.add(
+            sink=sys.stderr,
+            format=console_format,
+            level=self._log_level,
+            colorize=True
+        )
+        
+        # 添加文件handler
+        if self._log_file:
+            logger.add(
+                sink=self._log_file,
+                format=file_format,
+                level=self._log_level,
+                rotation="10 MB",
+                retention="7 days",
+                compression="zip",
+                encoding="utf-8"
+            )
+        
+        logger.info(f"日志级别已从 {old_level} 更新为: {self._log_level}")
     
     @property
     def is_initialized(self) -> bool:
@@ -263,7 +299,3 @@ class LoggerMixin:
         error_msg = f"{context}: {str(error)}" if context else str(error)
         self.logger.error(error_msg)
         self.logger.exception("详细错误堆栈:")
-
-
-# 创建全局logger实例
-app_logger = setup_logger()

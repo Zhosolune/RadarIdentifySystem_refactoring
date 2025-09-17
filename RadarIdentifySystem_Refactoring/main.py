@@ -12,6 +12,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication
 from qfluentwidgets import FluentTranslator
 
+from models.utils.log_manager import setup_logger
 from models.config.app_config import _app_cfg
 from views.main_window import MainWindow
 
@@ -21,6 +22,10 @@ sys.path.insert(0, str(project_root))
 
 def main():
     """主函数"""
+    # 初始化日志系统
+    log_level = _app_cfg.get(_app_cfg.logLevel)
+    setup_logger(log_level=log_level)
+
     # 在创建QApplication之前设置高DPI支持
     QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
     

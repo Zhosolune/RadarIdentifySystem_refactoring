@@ -3,7 +3,7 @@ from PyQt6.QtCore import QObject
 from PyQt6.QtGui import QColor
 from qfluentwidgets import setTheme, setThemeColor
 from views.interfaces.settings_interface import SettingsInterface
-from models.utils.log_manager import LoggerMixin
+from models.utils.log_manager import LoggerMixin, get_log_manager
 from models.config.app_config import _app_cfg
 from models.utils.signal_bus import mw_signalBus
 
@@ -46,15 +46,17 @@ class SettingsController(QObject, LoggerMixin):
         - 连接 _app_cfg.themeChanged -> setTheme（由 PFW 生效整个主题明/暗）；
         - 连接 _app_cfg.themeChanged -> _on_theme_changed（日志/业务扩展点）；
         - 连接 _app_cfg.dpiScale.valueChanged -> _on_dpi_scale_changed（DPI变化处理）；
+        - 连接 _app_cfg.logLevel.valueChanged -> _on_log_level_changed（日志级别变化处理）；
         
         Returns:
             None
         """
-        self.logger.debug("正在设置全局主题信号连接")
+        self.logger.info("正在设置全局主题信号连接")
         _app_cfg.themeChanged.connect(setTheme)
         _app_cfg.themeChanged.connect(self._on_theme_changed)
         _app_cfg.dpiScale.valueChanged.connect(self._on_dpi_scale_changed)
-        self.logger.info("全局主题和DPI信号连接已建立")
+        _app_cfg.logLevel.valueChanged.connect(self._on_log_level_changed)
+        self.logger.info("全局主题、DPI和日志级别信号连接已建立")
 
     def _connect_interface_signals(self) -> None:
         """连接设置界面中与主题无关或后续可扩展的信号
@@ -73,16 +75,16 @@ class SettingsController(QObject, LoggerMixin):
             # 连接主题色变化信号
             self._settings_interface.themeColorCard.colorChanged.connect(lambda c: setThemeColor(c))
             self._settings_interface.themeColorCard.colorChanged.connect(self._on_theme_color_changed)
-            self.logger.debug("主题色卡片信号连接成功")
+            self.logger.info("主题色卡片信号连接成功")
         except AttributeError as e:
-            self.logger.debug(f"未找到 themeColorCard 或其 colorChanged 信号: {e}")
+            self.logger.info(f"未找到 themeColorCard 或其 colorChanged 信号: {e}")
         
         try:
             # 连接云母效果开关信号
             self._settings_interface.micaCard.checkedChanged.connect(mw_signalBus.micaEnableChanged)
-            self.logger.debug("云母效果卡片信号连接成功")
+            self.logger.info("云母效果卡片信号连接成功")
         except AttributeError as e:
-            self.logger.debug(f"未找到 micaCard 或其 checkedChanged 信号: {e}")
+            self.logger.info(f"未找到 micaCard 或其 checkedChanged 信号: {e}")
 
     def _on_theme_changed(self) -> None:
         """主题明/暗变化时的回调处理
@@ -126,4 +128,25 @@ class SettingsController(QObject, LoggerMixin):
         """
         self.logger.info(f"DPI缩放已变更为: {value}，准备显示重启确认对话框")
         self._settings_interface.showRestartTooltip()
+    
+    def _on_log_level_changed(self, value: str) -> None:
+        """日志级别变化时的回调处理
+        
+        当日志级别设置变更时触发，动态更新日志管理器的级别。
+        
+        Args:
+            value: 新的日志级别值
+        
+        Returns:
+            None
+        
+        Raises:
+            None
+        """
+        try:
+            log_manager = get_log_manager()
+            log_manager.set_level(value)
+            self.logger.info(f"日志级别已动态更新为: {value}")
+        except Exception as e:
+            self.logger.error(f"更新日志级别失败: {e}")
     

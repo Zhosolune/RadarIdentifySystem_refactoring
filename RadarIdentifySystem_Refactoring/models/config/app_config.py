@@ -34,6 +34,7 @@ class AppConfig(QConfig):
     # 主窗口
     micaEnabled = ConfigItem("MainWindow", "MicaEnabled", isWin11(), BoolValidator())
     dpiScale = OptionsConfigItem("MainWindow", "DpiScale", "Auto", OptionsValidator([1, 1.25, 1.5, 1.75, 2, "Auto"]))
+    logLevel = OptionsConfigItem("MainWindow", "logLevel", "INFO", OptionsValidator(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]))
 
     def __init__(self):
         """初始化应用程序配置"""

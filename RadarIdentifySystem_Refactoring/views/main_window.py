@@ -34,6 +34,7 @@ class MainWindow(MSFluentWindow, LoggerMixin):
             None
         """
         super().__init__(parent)
+
         self._init_window()
 
         # 创建子界面

@@ -3,6 +3,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QResizeEvent
 from qfluentwidgets import (
     OptionsSettingCard,
+    ComboBoxSettingCard,
     ExpandLayout,
     ScrollArea,
     SettingCardGroup,
@@ -41,6 +42,17 @@ class SettingsInterface(ScrollArea, LoggerMixin):
 
         # 设置标签
         self.settingLabel = QLabel("设置", self)
+
+        # 基本设置
+        self.basicGroup = SettingCardGroup("基本设置", self.scrollWidget)
+        self.logLevelCard = ComboBoxSettingCard(
+            _app_cfg.logLevel,
+            FIF.DOCUMENT,
+            "日志级别",
+            "调整应用的日志记录级别",
+            texts=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+            parent=self.basicGroup,
+        )
 
         # 个性化
         self.personalGroup = SettingCardGroup("个性化", self.scrollWidget)
@@ -130,6 +142,8 @@ class SettingsInterface(ScrollArea, LoggerMixin):
         self._updateLabelPosition()
 
         # 添加设置卡片到组
+        self.basicGroup.addSettingCard(self.logLevelCard)
+        
         self.personalGroup.addSettingCard(self.micaCard)
         self.personalGroup.addSettingCard(self.themeCard)
         self.personalGroup.addSettingCard(self.themeColorCard)
@@ -141,6 +155,7 @@ class SettingsInterface(ScrollArea, LoggerMixin):
         # 添加设置卡片组到布局
         self.expandLayout.setSpacing(28)
         self.expandLayout.setContentsMargins(36, 10, 36, 0)
+        self.expandLayout.addWidget(self.basicGroup)
         self.expandLayout.addWidget(self.personalGroup)
         self.expandLayout.addWidget(self.aboutGroup)
 

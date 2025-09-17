@@ -1,10 +1,11 @@
 {
     "MainWindow": {
         "DpiScale": "Auto",
+        "logLevel": "DEBUG",
         "MicaEnabled": true
     },
     "QFluentWidgets": {
         "ThemeColor": "#ff4772c3",
-        "ThemeMode": "Auto"
+        "ThemeMode": "Light"
     }
 }
