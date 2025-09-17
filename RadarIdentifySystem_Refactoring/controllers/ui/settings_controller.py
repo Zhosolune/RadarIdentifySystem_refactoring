@@ -1,5 +1,5 @@
 from typing import Optional
-from PyQt6.QtCore import QObject, QTimer
+from PyQt6.QtCore import QObject
 from PyQt6.QtGui import QColor
 from qfluentwidgets import setTheme, setThemeColor
 from views.interfaces.settings_interface import SettingsInterface
@@ -33,7 +33,7 @@ class SettingsController(QObject, LoggerMixin):
         """
         super().__init__(parent=parent)
             
-        self._settings_interface: SettingsInterface = settings_interface
+        self.settings_interface: SettingsInterface = settings_interface
         
         self.logger.info("正在初始化设置控制器")
         self._setup_app_connections()
@@ -59,9 +59,9 @@ class SettingsController(QObject, LoggerMixin):
     def _connect_interface_signals(self) -> None:
         """连接设置界面中与主题无关或后续可扩展的信号
 
-        - 连接 _settings_interface.themeColorCard -> setThemeColor（由 PFW 生效整个主题色）；
-        - 连接 _settings_interface.themeColorCard -> _on_theme_color_changed（仅记录日志）。
-        - 连接 _settings_interface.micaCard -> mw_signalBus.micaEnableChanged（是否开启云母效果）。
+        - 连接 settings_interface.themeColorCard -> setThemeColor（由 PFW 生效整个主题色）；
+        - 连接 settings_interface.themeColorCard -> _on_theme_color_changed（仅记录日志）。
+        - 连接 settings_interface.micaCard -> mw_signalBus.micaEnableChanged（是否开启云母效果）。
 
         Returns:
             None
@@ -69,12 +69,20 @@ class SettingsController(QObject, LoggerMixin):
         Raises:
             None
         """
-        if hasattr(self._settings_interface, "themeColorCard") and hasattr(self._settings_interface.themeColorCard, "colorChanged"):
-            self._settings_interface.themeColorCard.colorChanged.connect(lambda c: setThemeColor(c))
-            self._settings_interface.themeColorCard.colorChanged.connect(self._on_theme_color_changed)
-            self._settings_interface.micaCard.checkedChanged.connect(mw_signalBus.micaEnableChanged)
-        else:
-            self.logger.debug("未找到 themeColorCard 或其 colorChanged 信号；当前为配置驱动，跳过接线")
+        try:
+            # 连接主题色变化信号
+            self.settings_interface.themeColorCard.colorChanged.connect(lambda c: setThemeColor(c))
+            self.settings_interface.themeColorCard.colorChanged.connect(self._on_theme_color_changed)
+            self.logger.debug("主题色卡片信号连接成功")
+        except AttributeError as e:
+            self.logger.debug(f"未找到 themeColorCard 或其 colorChanged 信号: {e}")
+        
+        try:
+            # 连接云母效果开关信号
+            self.settings_interface.micaCard.checkedChanged.connect(mw_signalBus.micaEnableChanged)
+            self.logger.debug("云母效果卡片信号连接成功")
+        except AttributeError as e:
+            self.logger.debug(f"未找到 micaCard 或其 checkedChanged 信号: {e}")
 
     def _on_theme_changed(self) -> None:
         """主题明/暗变化时的回调处理
@@ -117,5 +125,5 @@ class SettingsController(QObject, LoggerMixin):
             None
         """
         self.logger.info(f"DPI缩放已变更为: {value}，准备显示重启确认对话框")
-        self._settings_interface.showRestartTooltip()
+        self.settings_interface.showRestartTooltip()
     
