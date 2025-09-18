@@ -3,15 +3,18 @@
 """
 日志级别实时更新功能测试
 
-测试设置界面中日志级别设置项的实时更新功能，验证MVC架构下的信号连接和处理。
-
-Author: Assistant
-Date: 2025-01-10
+测试日志级别变更时的实时更新功能，包括：
+1. 信号连接的正确性
+2. 日志级别变更处理
+3. UI与后端的集成
+4. 错误处理机制
+5. MVC架构合规性
 """
 
 import sys
 import os
 import unittest
+import logging
 from unittest.mock import Mock, patch, MagicMock
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import QTimer
@@ -24,6 +27,10 @@ from views.interfaces.settings_interface import SettingsInterface
 from controllers.ui.settings_controller import SettingsController
 from models.utils.log_manager import get_log_manager
 from models.config.app_config import _app_cfg
+
+# 配置测试日志
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
 
 
 class TestLogLevelRealtimeUpdate(unittest.TestCase):
@@ -81,7 +88,7 @@ class TestLogLevelRealtimeUpdate(unittest.TestCase):
             _app_cfg.logLevel
         )
         
-        print("✓ 日志级别信号连接测试通过")
+        logger.info("✓ 日志级别信号连接测试通过")
     
     @patch('controllers.ui.settings_controller.get_log_manager')
     def test_log_level_change_handling(self, mock_get_log_manager) -> None:
@@ -111,7 +118,7 @@ class TestLogLevelRealtimeUpdate(unittest.TestCase):
                 # 验证set_level被调用
                 mock_log_manager.set_level.assert_called_with(level)
         
-        print("✓ 日志级别变更处理测试通过")
+        logger.info("✓ 日志级别变更处理测试通过")
     
     def test_log_level_ui_integration(self) -> None:
         """测试日志级别UI集成
@@ -136,7 +143,7 @@ class TestLogLevelRealtimeUpdate(unittest.TestCase):
             # 验证配置项是否更新
             self.assertEqual(_app_cfg.logLevel.value, test_level)
         
-        print("✓ 日志级别UI集成测试通过")
+        logger.info("✓ 日志级别UI集成测试通过")
     
     @patch('controllers.ui.settings_controller.get_log_manager')
     def test_error_handling(self, mock_get_log_manager: Mock) -> None:
@@ -155,7 +162,7 @@ class TestLogLevelRealtimeUpdate(unittest.TestCase):
         # 触发配置变更，应该不会抛出未处理的异常
         try:
             _app_cfg.logLevel.valueChanged.emit("DEBUG")
-            print("✓ 错误处理测试通过")
+            logger.info("✓ 错误处理测试通过")
         except Exception as e:
             self.fail(f"控制器未正确处理异常: {e}")
     
@@ -182,7 +189,7 @@ class TestLogLevelRealtimeUpdate(unittest.TestCase):
         self.assertTrue(hasattr(self.settings_controller, '_on_log_level_changed'))
         self.assertTrue(callable(self.settings_controller._on_log_level_changed))
         
-        print("✓ MVC架构合规性测试通过")
+        logger.info("✓ MVC架构合规性测试通过")
 
 
 def main():
@@ -190,7 +197,7 @@ def main():
     
     运行所有测试用例。
     """
-    print("开始日志级别实时更新功能测试...")
+    logger.info("开始日志级别实时更新功能测试...")
     
     try:
         # 创建测试套件
@@ -201,14 +208,14 @@ def main():
         result = runner.run(suite)
         
         if result.wasSuccessful():
-            print("\n🎉 所有测试通过！日志级别实时更新功能正常工作。")
+            logger.info("🎉 所有测试通过！日志级别实时更新功能正常工作。")
             return True
         else:
-            print(f"\n❌ 测试失败: {len(result.failures)} 个失败, {len(result.errors)} 个错误")
+            logger.error(f"❌ 测试失败: {len(result.failures)} 个失败, {len(result.errors)} 个错误")
             return False
         
     except Exception as e:
-        print(f"\n❌ 测试执行失败: {e}")
+        logger.error(f"❌ 测试执行失败: {e}")
         import traceback
         traceback.print_exc()
         return False

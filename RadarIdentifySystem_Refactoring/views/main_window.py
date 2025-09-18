@@ -96,7 +96,7 @@ class MainWindow(MSFluentWindow, LoggerMixin):
             settings_interface=self.settings_interface, 
             parent=self
         )
-        self.logger.info("创建设置控制器")
+        self.logger.info("主窗口实例化设置控制器")
         
         # 添加导航项
         self.addSubInterface(

@@ -7,11 +7,16 @@ DPI配置测试脚本
 
 import sys
 import os
+import logging
 
 # 添加项目根目录到Python路径
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from models.config.app_config import _app_cfg
+
+# 配置测试日志
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
 
 def test_dpi_config():
     """
@@ -20,15 +25,15 @@ def test_dpi_config():
     Returns:
         bool: 测试是否通过
     """
-    print("=== DPI配置测试 ===")
+    logger.info("=== DPI配置测试 ===")
     
     # 测试默认值
     current_dpi = _app_cfg.get(_app_cfg.dpiScale)
-    print(f"当前DPI设置: {current_dpi}")
+    logger.info(f"当前DPI设置: {current_dpi}")
     
     # 测试所有可用选项
     available_options = _app_cfg.dpiScale.validator.values if hasattr(_app_cfg.dpiScale.validator, 'values') else ["100%", "125%", "150%", "175%", "200%", "Auto"]
-    print(f"可用DPI选项: {available_options}")
+    logger.info(f"可用DPI选项: {available_options}")
     
     # 测试设置不同的DPI值
     test_values = ["100%", "125%", "150%", "175%", "200%", "Auto"]
@@ -41,17 +46,17 @@ def test_dpi_config():
             retrieved_value = _app_cfg.get(_app_cfg.dpiScale)
             
             if retrieved_value == test_value:
-                print(f"✓ {test_value} -> {retrieved_value} (成功)")
+                logger.info(f"✓ {test_value} -> {retrieved_value} (成功)")
             else:
-                print(f"✗ {test_value} -> {retrieved_value} (失败)")
+                logger.error(f"✗ {test_value} -> {retrieved_value} (失败)")
                 return False
                 
         except Exception as e:
-            print(f"✗ 设置 {test_value} 时出错: {e}")
+            logger.error(f"✗ 设置 {test_value} 时出错: {e}")
             return False
     
     # 测试百分比转换逻辑
-    print("\n=== 百分比转换测试 ===")
+    logger.info("=== 百分比转换测试 ===")
     test_conversions = {
         "100%": 1.0,
         "125%": 1.25,
@@ -67,12 +72,12 @@ def test_dpi_config():
             scale_value = float(percent_str)
             
         if abs(scale_value - expected_value) < 0.001:
-            print(f"✓ {percent_str} -> {scale_value} (预期: {expected_value})")
+            logger.info(f"✓ {percent_str} -> {scale_value} (预期: {expected_value})")
         else:
-            print(f"✗ {percent_str} -> {scale_value} (预期: {expected_value})")
+            logger.error(f"✗ {percent_str} -> {scale_value} (预期: {expected_value})")
             return False
     
-    print("\n=== 所有测试通过 ===")
+    logger.info("=== 所有测试通过 ===")
     return True
 
 if __name__ == "__main__":

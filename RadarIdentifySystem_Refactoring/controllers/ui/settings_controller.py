@@ -35,7 +35,7 @@ class SettingsController(QObject, LoggerMixin):
             
         self._settings_interface: SettingsInterface = settings_interface
         
-        self.logger.info("正在初始化设置控制器")
+        self.logger.debug("正在初始化设置控制器")
         self._setup_app_connections()
         self._connect_interface_signals()
         self.logger.info("设置控制器初始化成功，界面信号已连接")
@@ -51,12 +51,12 @@ class SettingsController(QObject, LoggerMixin):
         Returns:
             None
         """
-        self.logger.info("正在设置全局主题信号连接")
+        self.logger.debug("正在设置全局主题信号连接")
         _app_cfg.themeChanged.connect(setTheme)
         _app_cfg.themeChanged.connect(self._on_theme_changed)
         _app_cfg.dpiScale.valueChanged.connect(self._on_dpi_scale_changed)
         _app_cfg.logLevel.valueChanged.connect(self._on_log_level_changed)
-        self.logger.info("全局主题、DPI和日志级别信号连接已建立")
+        self.logger.debug("全局主题、DPI和日志级别信号连接已建立")
 
     def _connect_interface_signals(self) -> None:
         """连接设置界面中与主题无关或后续可扩展的信号
@@ -75,16 +75,16 @@ class SettingsController(QObject, LoggerMixin):
             # 连接主题色变化信号
             self._settings_interface.themeColorCard.colorChanged.connect(lambda c: setThemeColor(c))
             self._settings_interface.themeColorCard.colorChanged.connect(self._on_theme_color_changed)
-            self.logger.info("主题色卡片信号连接成功")
+            self.logger.debug("主题色卡片信号连接成功")
         except AttributeError as e:
-            self.logger.info(f"未找到 themeColorCard 或其 colorChanged 信号: {e}")
+            self.logger.debug(f"未找到 themeColorCard 或其 colorChanged 信号: {e}")
         
         try:
             # 连接云母效果开关信号
             self._settings_interface.micaCard.checkedChanged.connect(mw_signalBus.micaEnableChanged)
-            self.logger.info("云母效果卡片信号连接成功")
+            self.logger.debug("云母效果卡片信号连接成功")
         except AttributeError as e:
-            self.logger.info(f"未找到 micaCard 或其 checkedChanged 信号: {e}")
+            self.logger.debug(f"未找到 micaCard 或其 checkedChanged 信号: {e}")
 
     def _on_theme_changed(self) -> None:
         """主题明/暗变化时的回调处理

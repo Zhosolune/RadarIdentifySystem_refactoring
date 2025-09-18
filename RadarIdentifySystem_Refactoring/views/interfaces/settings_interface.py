@@ -49,7 +49,7 @@ class SettingsInterface(ScrollArea, LoggerMixin):
             _app_cfg.logLevel,
             FIF.DOCUMENT,
             "日志级别",
-            "调整应用的日志记录级别",
+            "调整应用的日志记录级别，DEBUG级别最低。选择的级别越高，过滤掉的日志输出越多。",
             texts=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
             parent=self.basicGroup,
         )
@@ -177,8 +177,6 @@ class SettingsInterface(ScrollArea, LoggerMixin):
         
         # 设置标签位置
         self.settingLabel.move(label_x, 30)
-        
-        self.logger.debug(f"更新设置标签位置: x={label_x}, 窗口宽度={window_width}, 滚动区域宽度={scroll_area_width}")
     
     def resizeEvent(self, event: QResizeEvent) -> None:
         """窗口大小变化事件处理
