@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from views.interfaces.settings_interface import SettingsInterface
 from controllers.ui.settings_controller import SettingsController
 from models.utils.log_manager import get_log_manager
-from models.config.app_config import _app_cfg
+from models.config.app_config import cfg
 
 # 配置测试日志
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
@@ -85,7 +85,7 @@ class TestLogLevelRealtimeUpdate(unittest.TestCase):
         # 验证日志级别卡片绑定了正确的配置项
         self.assertEqual(
             self.settings_interface.logLevelCard.configItem, 
-            _app_cfg.logLevel
+            cfg.logLevel
         )
         
         logger.info("✓ 日志级别信号连接测试通过")
@@ -113,7 +113,7 @@ class TestLogLevelRealtimeUpdate(unittest.TestCase):
                 mock_log_manager.reset_mock()
                 
                 # 触发信号
-                _app_cfg.logLevel.valueChanged.emit(level)
+                cfg.logLevel.valueChanged.emit(level)
                 
                 # 验证set_level被调用
                 mock_log_manager.set_level.assert_called_with(level)
@@ -129,7 +129,7 @@ class TestLogLevelRealtimeUpdate(unittest.TestCase):
         log_level_card = self.settings_interface.logLevelCard
         
         # 验证初始值
-        initial_value = _app_cfg.logLevel.value
+        initial_value = cfg.logLevel.value
         self.assertEqual(log_level_card.comboBox.currentText(), initial_value)
         
         # 测试UI变更是否更新配置
@@ -141,7 +141,7 @@ class TestLogLevelRealtimeUpdate(unittest.TestCase):
             log_level_card.comboBox.setCurrentIndex(index)
             
             # 验证配置项是否更新
-            self.assertEqual(_app_cfg.logLevel.value, test_level)
+            self.assertEqual(cfg.logLevel.value, test_level)
         
         logger.info("✓ 日志级别UI集成测试通过")
     
@@ -161,7 +161,7 @@ class TestLogLevelRealtimeUpdate(unittest.TestCase):
         
         # 触发配置变更，应该不会抛出未处理的异常
         try:
-            _app_cfg.logLevel.valueChanged.emit("DEBUG")
+            cfg.logLevel.valueChanged.emit("DEBUG")
             logger.info("✓ 错误处理测试通过")
         except Exception as e:
             self.fail(f"控制器未正确处理异常: {e}")
@@ -170,19 +170,19 @@ class TestLogLevelRealtimeUpdate(unittest.TestCase):
         """测试MVC架构合规性
         
         验证实现是否遵循MVC架构原则：
-        - Model层（_app_cfg）负责数据管理
+        - Model层（cfg）负责数据管理
         - View层（SettingsInterface）负责UI展示
         - Controller层（SettingsController）负责协调
         """
         # 验证Model层：配置项存在且类型正确
-        self.assertTrue(hasattr(_app_cfg, 'logLevel'))
-        self.assertIn(_app_cfg.logLevel.value, ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
+        self.assertTrue(hasattr(cfg, 'logLevel'))
+        self.assertIn(cfg.logLevel.value, ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
         
         # 验证View层：UI组件存在且绑定正确
         self.assertTrue(hasattr(self.settings_interface, 'logLevelCard'))
         self.assertEqual(
             self.settings_interface.logLevelCard.configItem, 
-            _app_cfg.logLevel
+            cfg.logLevel
         )
         
         # 验证Controller层：信号处理方法存在

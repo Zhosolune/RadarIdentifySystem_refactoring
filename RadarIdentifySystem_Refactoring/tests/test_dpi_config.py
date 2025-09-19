@@ -12,7 +12,7 @@ import logging
 # 添加项目根目录到Python路径
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from models.config.app_config import _app_cfg
+from models.config.app_config import cfg
 
 # 配置测试日志
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
@@ -28,11 +28,11 @@ def test_dpi_config():
     logger.info("=== DPI配置测试 ===")
     
     # 测试默认值
-    current_dpi = _app_cfg.get(_app_cfg.dpiScale)
+    current_dpi = cfg.get(cfg.dpiScale)
     logger.info(f"当前DPI设置: {current_dpi}")
     
     # 测试所有可用选项
-    available_options = _app_cfg.dpiScale.validator.values if hasattr(_app_cfg.dpiScale.validator, 'values') else ["100%", "125%", "150%", "175%", "200%", "Auto"]
+    available_options = cfg.dpiScale.validator.values if hasattr(cfg.dpiScale.validator, 'values') else ["100%", "125%", "150%", "175%", "200%", "Auto"]
     logger.info(f"可用DPI选项: {available_options}")
     
     # 测试设置不同的DPI值
@@ -41,9 +41,9 @@ def test_dpi_config():
     for test_value in test_values:
         try:
             # 设置DPI值
-            _app_cfg.set(_app_cfg.dpiScale, test_value)
+            cfg.set(cfg.dpiScale, test_value)
             # 获取设置的值
-            retrieved_value = _app_cfg.get(_app_cfg.dpiScale)
+            retrieved_value = cfg.get(cfg.dpiScale)
             
             if retrieved_value == test_value:
                 logger.info(f"✓ {test_value} -> {retrieved_value} (成功)")

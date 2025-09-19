@@ -34,7 +34,7 @@ class TestSettingsController(unittest.TestCase):
         self.controller = None
         self.mock_settings_interface = None
 
-    @patch('controllers.ui.settings_controller._app_cfg')
+    @patch('controllers.ui.settings_controller.cfg')
     def test_init_and_signal_setup(self, mock_app_cfg: Mock) -> None:
         """测试初始化和全局信号连接
         
@@ -55,7 +55,7 @@ class TestSettingsController(unittest.TestCase):
         # 验证信号连接时未抛出异常
         self.assertIsInstance(self.controller, SettingsController)
 
-    @patch('controllers.ui.settings_controller._app_cfg')
+    @patch('controllers.ui.settings_controller.cfg')
     def test_set_settings_interface(self, mock_app_cfg: Mock) -> None:
         """测试设置界面关联
         
@@ -81,7 +81,7 @@ class TestSettingsController(unittest.TestCase):
         # 断言
         self.assertIs(self.controller.get_settings_interface(), interface)
 
-    @patch('controllers.ui.settings_controller._app_cfg')
+    @patch('controllers.ui.settings_controller.cfg')
     def test_theme_change_callbacks(self, mock_app_cfg: Mock) -> None:
         """测试主题变化回调方法
         
@@ -115,7 +115,7 @@ class TestSettingsController(unittest.TestCase):
         self.assertTrue(callable(self.controller._on_theme_changed))
         self.assertTrue(callable(self.controller._on_theme_color_changed))
 
-    @patch('controllers.ui.settings_controller._app_cfg')
+    @patch('controllers.ui.settings_controller.cfg')
     def test_config_driven_theme_color_no_direct_set(self, mock_app_cfg: Mock) -> None:
         """测试配置驱动下，不直接调用 setThemeColor
         
@@ -135,7 +135,7 @@ class TestSettingsController(unittest.TestCase):
         except Exception as e:
             self.fail(f"_on_theme_color_changed should not call setThemeColor directly: {e}")
 
-    @patch('controllers.ui.settings_controller._app_cfg')
+    @patch('controllers.ui.settings_controller.cfg')
     def test_color_card_no_direct_wiring(self, mock_app_cfg: Mock) -> None:
         """测试颜色选择卡不进行直接接线
         

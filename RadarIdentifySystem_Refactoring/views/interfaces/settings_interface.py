@@ -16,7 +16,7 @@ from qfluentwidgets import (
 )
 from qfluentwidgets import FluentIcon as FIF
 from typing import Optional
-from models.config.app_config import _app_cfg, AUTHOR, YEAR, HELP_URL, VERSION, isWin11
+from models.config.app_config import cfg, AUTHOR, YEAR, HELP_URL, VERSION, isWin11
 from models.theme.style_sheet import StyleSheet
 from models.utils.log_manager import LoggerMixin
 from models.ui.dimensions import UIDimensions
@@ -46,7 +46,7 @@ class SettingsInterface(ScrollArea, LoggerMixin):
         # 基本设置
         self.basicGroup = SettingCardGroup("基本设置", self.scrollWidget)
         self.logLevelCard = ComboBoxSettingCard(
-            _app_cfg.logLevel,
+            cfg.logLevel,
             FIF.DOCUMENT,
             "日志级别",
             "调整应用的日志记录级别，DEBUG级别最低。选择的级别越高，过滤掉的日志输出越多。",
@@ -60,11 +60,11 @@ class SettingsInterface(ScrollArea, LoggerMixin):
             FIF.TRANSPARENT, 
             "云母效果", 
             "窗口界面的半透明效果", 
-            _app_cfg.micaEnabled, 
+            cfg.micaEnabled, 
             self.personalGroup
         )
         self.themeCard = OptionsSettingCard(
-            _app_cfg.themeMode,
+            cfg.themeMode,
             FIF.BRUSH,
             "应用主题",
             "调整应用的外观",
@@ -72,14 +72,14 @@ class SettingsInterface(ScrollArea, LoggerMixin):
             parent=self.personalGroup,
         )
         self.themeColorCard = CustomColorSettingCard(
-            _app_cfg.themeColor, 
+            cfg.themeColor, 
             FIF.PALETTE, 
             "主题色", 
             "调整应用的主题色", 
             self.personalGroup
         )
         self.zoomCard = OptionsSettingCard(
-            _app_cfg.dpiScale,
+            cfg.dpiScale,
             FIF.ZOOM,
             "界面缩放",
             "调整界面的缩放比例",

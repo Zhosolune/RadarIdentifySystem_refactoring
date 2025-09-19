@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import QApplication
 from qfluentwidgets import FluentTranslator
 
 from models.utils.log_manager import setup_logger
-from models.config.app_config import _app_cfg
+from models.config.app_config import cfg
 from views.main_window import MainWindow
 
 # 将项目根目录添加到Python路径
@@ -32,7 +32,7 @@ def main():
     """
     try:
         # 初始化日志系统
-        setup_logger(log_level=_app_cfg.logLevel.value)
+        setup_logger(log_level=cfg.logLevel.value)
         
         # 设置高DPI支持
         if hasattr(Qt.ApplicationAttribute, 'AA_EnableHighDpiScaling'):
@@ -41,8 +41,8 @@ def main():
             QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps, True)
         
         # 设置DPI缩放
-        if _app_cfg.dpiScale.value != "Auto":
-            os.environ["QT_SCALE_FACTOR"] = str(_app_cfg.dpiScale.value)
+        if cfg.dpiScale.value != "Auto":
+            os.environ["QT_SCALE_FACTOR"] = str(cfg.dpiScale.value)
         else:
             if "QT_SCALE_FACTOR" in os.environ:
                 del os.environ["QT_SCALE_FACTOR"]

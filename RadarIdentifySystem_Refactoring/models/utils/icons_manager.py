@@ -8,6 +8,7 @@ from qfluentwidgets import FluentIconBase, getIconColor, Theme
 class Icon(FluentIconBase, Enum):
 
     PARAMS_CONFIG = "ParamsConfig"
+    IMPORT_FILE = "ImportFile"
 
     def path(self, theme=Theme.AUTO):
         # 获取项目根目录的绝对路径

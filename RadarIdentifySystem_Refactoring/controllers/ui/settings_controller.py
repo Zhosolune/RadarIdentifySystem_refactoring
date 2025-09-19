@@ -4,7 +4,7 @@ from PyQt6.QtGui import QColor
 from qfluentwidgets import setTheme, setThemeColor
 from views.interfaces.settings_interface import SettingsInterface
 from models.utils.log_manager import LoggerMixin, get_log_manager
-from models.config.app_config import _app_cfg
+from models.config.app_config import cfg
 from models.utils.signal_bus import mw_signalBus
 
 
@@ -13,7 +13,7 @@ class SettingsController(QObject, LoggerMixin):
     
     负责协调设置界面视图与配置模型之间的交互。
     现采用“配置驱动”的主题刷新策略：
-    - 直接监听 _app_cfg.themeChanged / themeColorChanged；
+    - 直接监听 cfg.themeChanged / themeColorChanged；
     - 仅在回调里记录日志，不再显式调用 setThemeColor；
     - 通过构造函数直接注入 SettingsInterface，确保控制器创建时就是完整可用的状态。
     """
@@ -43,19 +43,19 @@ class SettingsController(QObject, LoggerMixin):
     def _setup_app_connections(self) -> None:
         """设置全局信号连接
         
-        - 连接 _app_cfg.themeChanged -> setTheme（由 PFW 生效整个主题明/暗）；
-        - 连接 _app_cfg.themeChanged -> _on_theme_changed（日志/业务扩展点）；
-        - 连接 _app_cfg.dpiScale.valueChanged -> _on_dpi_scale_changed（DPI变化处理）；
-        - 连接 _app_cfg.logLevel.valueChanged -> _on_log_level_changed（日志级别变化处理）；
+        - 连接 cfg.themeChanged -> setTheme（由 PFW 生效整个主题明/暗）；
+        - 连接 cfg.themeChanged -> _on_theme_changed（日志/业务扩展点）；
+        - 连接 cfg.dpiScale.valueChanged -> _on_dpi_scale_changed（DPI变化处理）；
+        - 连接 cfg.logLevel.valueChanged -> _on_log_level_changed（日志级别变化处理）；
         
         Returns:
             None
         """
         self.logger.debug("正在设置全局主题信号连接")
-        _app_cfg.themeChanged.connect(setTheme)
-        _app_cfg.themeChanged.connect(self._on_theme_changed)
-        _app_cfg.dpiScale.valueChanged.connect(self._on_dpi_scale_changed)
-        _app_cfg.logLevel.valueChanged.connect(self._on_log_level_changed)
+        cfg.themeChanged.connect(setTheme)
+        cfg.themeChanged.connect(self._on_theme_changed)
+        cfg.dpiScale.valueChanged.connect(self._on_dpi_scale_changed)
+        cfg.logLevel.valueChanged.connect(self._on_log_level_changed)
         self.logger.debug("全局主题、DPI和日志级别信号连接已建立")
 
     def _connect_interface_signals(self) -> None:
@@ -94,7 +94,7 @@ class SettingsController(QObject, LoggerMixin):
         Returns:
             None
         """
-        current_theme = _app_cfg.themeMode.value
+        current_theme = cfg.themeMode.value
         self.logger.info(f"主题已切换为: {current_theme}")
 
     def _on_theme_color_changed(self, color: QColor) -> None:

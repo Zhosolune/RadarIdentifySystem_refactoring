@@ -21,10 +21,16 @@ def isWin11():
     """
     return sys.platform == "win32" and sys.getwindowsversion().build >= 22000
 
-class AppConfig(QConfig):
+YEAR = datetime.datetime.now().year
+AUTHOR = "ZhoSolune"
+VERSION = "1.0.0"
+COPYRIGHT = f"© {YEAR} {AUTHOR}"
+HELP_URL = ""
+
+class Config(QConfig):
     """应用程序配置类
-    
-    管理应用程序的所有配置项，包括主题设置、语言设置等。
+
+    管理应用程序的所有需要使用ConfigItem的配置项。
     """
 
     # 文件
@@ -36,22 +42,20 @@ class AppConfig(QConfig):
     dpiScale = OptionsConfigItem("MainWindow", "DpiScale", "Auto", OptionsValidator([1, 1.25, 1.5, 1.75, 2, "Auto"]))
     logLevel = OptionsConfigItem("MainWindow", "logLevel", "INFO", OptionsValidator(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]))
 
+    # 导入设置
+    importFileFormat = OptionsConfigItem("Import", "FileFormat", "Excel", OptionsValidator(["CSV", "Excel", "TXT", "MAT"]))
+    dataDirection = OptionsConfigItem("Import", "DataDirection", "列", OptionsValidator(["行", "列"]))
+
     def __init__(self):
         """初始化应用程序配置"""
         super().__init__()
 
-YEAR = datetime.datetime.now().year
-AUTHOR = "ZhoSolune"
-VERSION = "1.0.0"
-COPYRIGHT = f"© {YEAR} {AUTHOR}"
-HELP_URL = ""
-
 
 # 全局配置实例
-_app_cfg = AppConfig()
+cfg = Config()
 # 默认主题：跟随系统
-_app_cfg.themeMode.value = Theme.AUTO
+cfg.themeMode.value = Theme.AUTO
 # 导入配置文件
 # 获取项目根目录的绝对路径
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-qconfig.load(os.path.join(project_root, "app/config/app_config/config.json"), _app_cfg)
+qconfig.load(os.path.join(project_root, "app/config/app_config/config.json"), cfg)

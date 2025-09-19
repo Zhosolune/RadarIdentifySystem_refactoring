@@ -12,7 +12,7 @@ from controllers.ui.settings_controller import SettingsController
 from models.utils.log_manager import LoggerMixin
 from models.utils.icons_manager import Icon
 from models.utils.signal_bus import mw_signalBus
-from models.config.app_config import _app_cfg
+from models.config.app_config import cfg
 
 
 class MainWindow(MSFluentWindow, LoggerMixin):
@@ -63,7 +63,7 @@ class MainWindow(MSFluentWindow, LoggerMixin):
         self.setWindowTitle("雷达信号识别系统")
         self.resize(1200, 800)
 
-        self.setMicaEffectEnabled(_app_cfg.get(_app_cfg.micaEnabled))
+        self.setMicaEffectEnabled(cfg.get(cfg.micaEnabled))
 
         # create splash screen
         self.splashScreen = SplashScreen(self.windowIcon(), self)

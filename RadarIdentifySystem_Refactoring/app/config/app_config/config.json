@@ -1,8 +1,11 @@
 {
     "MainWindow": {
         "DpiScale": "Auto",
-        "logLevel": "DEBUG",
+        "logLevel": "INFO",
         "MicaEnabled": true
+    },
+    "Import": {
+        "FileFormat": "Excel"
     },
     "QFluentWidgets": {
         "ThemeColor": "#ff4772c3",
