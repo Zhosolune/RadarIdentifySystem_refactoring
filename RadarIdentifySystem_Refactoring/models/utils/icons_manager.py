@@ -1,6 +1,7 @@
 # coding: utf-8
 import os
 from enum import Enum
+from tkinter import HORIZONTAL
 
 from qfluentwidgets import FluentIconBase, getIconColor, Theme
 
@@ -9,6 +10,9 @@ class Icon(FluentIconBase, Enum):
 
     PARAMS_CONFIG = "ParamsConfig"
     IMPORT_FILE = "ImportFile"
+    DATA_DIRECTION = "DataDirection"
+    HORIZONTAL = "Horizontal"
+    VERTICAL = "Vertical"
 
     def path(self, theme=Theme.AUTO):
         # 获取项目根目录的绝对路径

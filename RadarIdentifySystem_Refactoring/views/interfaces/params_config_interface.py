@@ -22,7 +22,7 @@ from models.ui.dimensions import UIDimensions
 from models.utils.log_manager import LoggerMixin
 from models.utils.icons_manager import Icon
 from models.config.app_config import cfg
-from views.components.ttt import ExpandGroupSettingCard1
+from views.components import OptionsWithIconCard
 
 class ParamsConfigInterface(ScrollArea, LoggerMixin):
     """参数配置界面
@@ -55,8 +55,8 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
             texts=["CSV", "Excel", "TXT", "MAT"], 
             parent=self.importGroup
         )
-        self.importDataDirectionCard = ExpandGroupSettingCard1(
-            FIF.CAFE, 
+        self.dataDirectionCard = OptionsWithIconCard(
+            Icon.DATA_DIRECTION, 
             "数据方向", 
             "选择数据的方向", 
             parent=self.importGroup
@@ -97,7 +97,7 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
 
         # 添加设置卡片到组
         self.importGroup.addSettingCard(self.importFileFormatCard)
-        self.importGroup.addSettingCard(self.importDataDirectionCard)
+        self.importGroup.addSettingCard(self.dataDirectionCard)
 
         # 添加卡片组到布局
         self.expandLayout.setSpacing(28)
