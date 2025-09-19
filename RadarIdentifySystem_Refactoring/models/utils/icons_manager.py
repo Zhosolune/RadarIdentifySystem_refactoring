@@ -13,6 +13,7 @@ class Icon(FluentIconBase, Enum):
     DATA_DIRECTION = "DataDirection"
     HORIZONTAL = "Horizontal"
     VERTICAL = "Vertical"
+    IGNORE_FIRST_LINE = "IgnoreFirstLine"
 
     def path(self, theme=Theme.AUTO):
         # 获取项目根目录的绝对路径

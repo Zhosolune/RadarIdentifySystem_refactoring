@@ -30,50 +30,50 @@ def main():
         ImportError: 当缺少必要的依赖包时
         Exception: 当应用程序启动失败时
     """
-    try:
-        # 初始化日志系统
-        setup_logger(log_level=cfg.logLevel.value)
-        
-        # 设置高DPI支持
-        if hasattr(Qt.ApplicationAttribute, 'AA_EnableHighDpiScaling'):
-            QApplication.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling, True)
-        if hasattr(Qt.ApplicationAttribute, 'AA_UseHighDpiPixmaps'):
-            QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps, True)
-        
-        # 设置DPI缩放
-        if cfg.dpiScale.value != "Auto":
-            os.environ["QT_SCALE_FACTOR"] = str(cfg.dpiScale.value)
-        else:
-            if "QT_SCALE_FACTOR" in os.environ:
-                del os.environ["QT_SCALE_FACTOR"]
-                    
-        app = QApplication(sys.argv)
-        app.setAttribute(Qt.ApplicationAttribute.AA_DontCreateNativeWidgetSiblings)
-        app.setApplicationName("雷达信号识别系统")
-        app.setApplicationVersion("2.0.0")
+    # try:
+    # 初始化日志系统
+    setup_logger(log_level=cfg.logLevel.value)
+    
+    # 设置高DPI支持
+    if hasattr(Qt.ApplicationAttribute, 'AA_EnableHighDpiScaling'):
+        QApplication.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling, True)
+    if hasattr(Qt.ApplicationAttribute, 'AA_UseHighDpiPixmaps'):
+        QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps, True)
+    
+    # 设置DPI缩放
+    if cfg.dpiScale.value != "Auto":
+        os.environ["QT_SCALE_FACTOR"] = str(cfg.dpiScale.value)
+    else:
+        if "QT_SCALE_FACTOR" in os.environ:
+            del os.environ["QT_SCALE_FACTOR"]
+                
+    app = QApplication(sys.argv)
+    app.setAttribute(Qt.ApplicationAttribute.AA_DontCreateNativeWidgetSiblings)
+    app.setApplicationName("雷达信号识别系统")
+    app.setApplicationVersion("2.0.0")
 
-        # 安装翻译器
-        translator = FluentTranslator()
-        app.installTranslator(translator)
+    # 安装翻译器
+    translator = FluentTranslator()
+    app.installTranslator(translator)
+    
+    # 创建主窗口
+    window = MainWindow()
+    window.show()
+    
+    return app.exec()
         
-        # 创建主窗口
-        window = MainWindow()
-        window.show()
-        
-        return app.exec()
-        
-    except ImportError as e:
-        from models.utils.log_manager import get_log_manager
-        logger = get_log_manager().get_logger()
-        logger.error(f"导入错误: {e}")
-        logger.error("请确保已安装PyQt6和PyQt6-Fluent-Widgets")
-        logger.error("运行: pip install PyQt6 PyQt6-Fluent-Widgets")
-        return 1
-    except Exception as e:
-        from models.utils.log_manager import get_log_manager
-        logger = get_log_manager().get_logger()
-        logger.critical(f"启动错误: {e}")
-        return 1
+    # except ImportError as e:
+    #     from models.utils.log_manager import get_log_manager
+    #     logger = get_log_manager().get_logger()
+    #     logger.error(f"导入错误: {e}")
+    #     logger.error("请确保已安装PyQt6和PyQt6-Fluent-Widgets")
+    #     logger.error("运行: pip install PyQt6 PyQt6-Fluent-Widgets")
+    #     return 1
+    # except Exception as e:
+    #     from models.utils.log_manager import get_log_manager
+    #     logger = get_log_manager().get_logger()
+    #     logger.critical(f"启动错误: {e}")
+    #     return 1
     
 if __name__ == "__main__":
     sys.exit(main())

@@ -40,11 +40,12 @@ class Config(QConfig):
     # 主窗口
     micaEnabled = ConfigItem("MainWindow", "MicaEnabled", isWin11(), BoolValidator())
     dpiScale = OptionsConfigItem("MainWindow", "DpiScale", "Auto", OptionsValidator([1, 1.25, 1.5, 1.75, 2, "Auto"]))
-    logLevel = OptionsConfigItem("MainWindow", "logLevel", "INFO", OptionsValidator(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]))
+    logLevel = OptionsConfigItem("MainWindow", "LogLevel", "INFO", OptionsValidator(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]))
 
     # 导入设置
     importFileFormat = OptionsConfigItem("Import", "FileFormat", "Excel", OptionsValidator(["CSV", "Excel", "TXT", "MAT"]))
-    dataDirection = OptionsConfigItem("Import", "DataDirection", "列", OptionsValidator(["行", "列"]))
+    dataDirection = OptionsConfigItem("Import", "DataDirection", "vertical", OptionsValidator(["horizontal", "vertical"]))
+    ignoreFirstLine = ConfigItem("Import", "IgnoreFirstLine", False, BoolValidator())
 
     def __init__(self):
         """初始化应用程序配置"""

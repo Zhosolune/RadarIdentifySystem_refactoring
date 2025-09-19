@@ -1,11 +1,12 @@
 {
     "Import": {
-        "DataDirection": "列",
+        "DataDirection": "vertical",
+        "IgnoreFirstLine": false,
         "FileFormat": "Excel"
     },
     "MainWindow": {
         "DpiScale": "Auto",
-        "logLevel": "DEBUG",
+        "LogLevel": "DEBUG",
         "MicaEnabled": true
     },
     "QFluentWidgets": {

@@ -56,11 +56,20 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
             parent=self.importGroup
         )
         self.dataDirectionCard = OptionsWithIconCard(
+            cfg.dataDirection,
             Icon.DATA_DIRECTION, 
             "数据方向", 
             "选择数据的方向", 
             parent=self.importGroup
         )
+        self.ignoreFirstLineCard = SwitchSettingCard(
+            Icon.IGNORE_FIRST_LINE, 
+            "忽略首行", 
+            "如果文件的第一行是表头等信息，开启开关可以在导入数据时忽略第一行", 
+            cfg.ignoreFirstLine, 
+            parent=self.importGroup
+        )
+        self._setup_switch(self.ignoreFirstLineCard)
 
 
 
@@ -98,6 +107,7 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
         # 添加设置卡片到组
         self.importGroup.addSettingCard(self.importFileFormatCard)
         self.importGroup.addSettingCard(self.dataDirectionCard)
+        self.importGroup.addSettingCard(self.ignoreFirstLineCard)
 
         # 添加卡片组到布局
         self.expandLayout.setSpacing(28)
@@ -124,6 +134,20 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
 
         # 设置标签位置
         self.settingLabel.move(label_x, 30)
+
+    def _setup_switch(self, switch_card: SwitchSettingCard) -> None:
+        """设置开关卡片
+
+        修改默认开关组件的中文文本。
+
+        Args:
+            switch_card: 开关卡片实例
+        """
+        switch_card.switchButton.setText(
+            "是" if switch_card.isChecked() else "否")
+        switch_card.switchButton.checkedChanged.connect(
+            lambda isChecked: switch_card.switchButton.setText(
+                "是" if isChecked else "否"))
 
     def resizeEvent(self, event: QResizeEvent) -> None:
         """窗口大小变化事件处理
