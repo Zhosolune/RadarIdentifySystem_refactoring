@@ -1,86 +1,53 @@
 from typing import Union
 from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QButtonGroup, QLabel
+from PyQt6.QtWidgets import QButtonGroup, QLabel, QWidget, QHBoxLayout
 
-from ...common.config import OptionsConfigItem, qconfig
-from ...common.icon import FluentIconBase
-from ..widgets.button import RadioButton
-from .expand_setting_card import ExpandSettingCard
+from qfluentwidgets import (
+    FluentIcon as FIF,
+    ExpandGroupSettingCard,
+)
+from views.components.item_card import AppCard
 
+class ExpandGroupSettingCard1(ExpandGroupSettingCard):
+    """Expand group setting card"""
 
-
-class OptionsSettingCard(ExpandSettingCard):
-    """setting card with a group of options"""
-
-    optionChanged = pyqtSignal(OptionsConfigItem)
-
-    def __init__(self, configItem, icon: Union[str, QIcon, FluentIconBase], title, content=None, texts=None, parent=None):
-        """
-        Parameters
-        ----------
-        configItem: OptionsConfigItem
-            options config item
-
-        icon: str | QIcon | FluentIconBase
-            the icon to be drawn
-
-        title: str
-            the title of setting card
-
-        content: str
-            the content of setting card
-
-        texts: List[str]
-            the texts of radio buttons
-
-        parent: QWidget
-            parent window
-        """
-        super().__init__(icon, title, content, parent)
-        self.texts = texts or []
-        self.configItem = configItem
-        self.configName = configItem.name
+    def __init__(self, icon: Union[str, QIcon, FIF], title: str, content: str = None, parent=None):
+        super().__init__(icon, "数据方向", "样本脉冲排列的方向", parent)
         self.choiceLabel = QLabel(self)
         self.buttonGroup = QButtonGroup(self)
 
         self.choiceLabel.setObjectName("titleLabel")
         self.addWidget(self.choiceLabel)
 
-        # create buttons
-        self.viewLayout.setSpacing(19)
-        self.viewLayout.setContentsMargins(48, 18, 0, 18)
-        for text, option in zip(texts, configItem.options):
-            button = RadioButton(text, self.view)
-            self.buttonGroup.addButton(button)
-            self.viewLayout.addWidget(button)
-            button.setProperty(self.configName, option)
+        self.viewLayout.setContentsMargins(0, 0, 0, 0)
+        self.viewLayout.setSpacing(0)
 
-        self._adjustViewSize()
-        self.setValue(qconfig.get(self.configItem))
-        configItem.valueChanged.connect(self.setValue)
-        self.buttonGroup.buttonClicked.connect(self.__onButtonClicked)
+        self._setup_ui()
 
-    def __onButtonClicked(self, button: RadioButton):
-        """button clicked slot"""
-        if button.text() == self.choiceLabel.text():
-            return
+    def _setup_ui(self):
 
-        value = button.property(self.configName)
-        qconfig.set(self.configItem, value)
+        # 第一组
+        self.horizontalIcon = FIF.ACCEPT
+        self.horizontalIcon = "水平方向"
+        self.horizontalContent = "样本脉冲横向排列"
 
-        self.choiceLabel.setText(button.text())
-        self.choiceLabel.adjustSize()
-        self.optionChanged.emit(self.configItem)
+        # 第二组
+        self.verticalIcon = FIF.ACCEPT
+        self.verticalText = "垂直方向"
+        self.verticalContent = "样本脉冲纵向排列"
 
-    def setValue(self, value):
-        """select button according to the value"""
-        qconfig.set(self.configItem, value)
+        # 添加各组到设置卡中
+        self.add(self.horizontalIcon, self.horizontalText, self.horizontalContent)
+        self.add(self.verticalIcon, self.verticalText, self.verticalContent)
 
-        for button in self.buttonGroup.buttons():
-            isChecked = button.property(self.configName) == value
-            button.setChecked(isChecked)
+    def add(self, icon: Union[str, QIcon, FIF], title: str, content: str = None):
+        w = AppCard(icon, title, content)
+        w.setFixedHeight(60)
+        # layout.setContentsMargins(48, 12, 48, 12)
 
-            if isChecked:
-                self.choiceLabel.setText(button.text())
-                self.choiceLabel.adjustSize()
+        # 添加组件到设置卡
+        self.addGroupWidget(w)
+
+
+

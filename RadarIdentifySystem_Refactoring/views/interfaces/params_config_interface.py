@@ -13,6 +13,7 @@ from qfluentwidgets import (
     PrimaryPushSettingCard,
     MessageBox,
     InfoBar,
+    ExpandGroupSettingCard,
 )
 from qfluentwidgets import FluentIcon as FIF
 from typing import Optional
