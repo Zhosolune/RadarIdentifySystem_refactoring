@@ -1,14 +1,15 @@
 {
+    "Import": {
+        "DataDirection": "列",
+        "FileFormat": "Excel"
+    },
     "MainWindow": {
         "DpiScale": "Auto",
-        "logLevel": "INFO",
+        "logLevel": "DEBUG",
         "MicaEnabled": true
-    },
-    "Import": {
-        "FileFormat": "Excel"
     },
     "QFluentWidgets": {
         "ThemeColor": "#ff4772c3",
-        "ThemeMode": "Light"
+        "ThemeMode": "Auto"
     }
 }

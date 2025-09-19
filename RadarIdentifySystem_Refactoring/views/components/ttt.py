@@ -1,13 +1,13 @@
 from typing import Union
 from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QButtonGroup, QLabel, QWidget, QHBoxLayout
+from PyQt6.QtWidgets import QButtonGroup, QLabel, QWidget, QVBoxLayout
 
 from qfluentwidgets import (
     FluentIcon as FIF,
     ExpandGroupSettingCard,
 )
-from views.components.item_card import AppCard
+from views.components.item_card import OptionsWithIconCard
 
 class ExpandGroupSettingCard1(ExpandGroupSettingCard):
     """Expand group setting card"""
@@ -20,16 +20,13 @@ class ExpandGroupSettingCard1(ExpandGroupSettingCard):
         self.choiceLabel.setObjectName("titleLabel")
         self.addWidget(self.choiceLabel)
 
-        self.viewLayout.setContentsMargins(0, 0, 0, 0)
-        self.viewLayout.setSpacing(0)
-
         self._setup_ui()
 
     def _setup_ui(self):
 
         # 第一组
         self.horizontalIcon = FIF.ACCEPT
-        self.horizontalIcon = "水平方向"
+        self.horizontalText = "水平方向"
         self.horizontalContent = "样本脉冲横向排列"
 
         # 第二组
@@ -42,12 +39,11 @@ class ExpandGroupSettingCard1(ExpandGroupSettingCard):
         self.add(self.verticalIcon, self.verticalText, self.verticalContent)
 
     def add(self, icon: Union[str, QIcon, FIF], title: str, content: str = None):
-        w = AppCard(icon, title, content)
+        w = OptionsWithIconCard(icon, title, content)
         w.setFixedHeight(60)
-        # layout.setContentsMargins(48, 12, 48, 12)
+        w.setObjectName("optionsWithIconCard")
 
         # 添加组件到设置卡
         self.addGroupWidget(w)
-
 
 
