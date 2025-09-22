@@ -7,7 +7,9 @@ from qfluentwidgets import (
     QConfig,
     ConfigItem,
     OptionsConfigItem,
+    RangeConfigItem,
     BoolValidator,
+    RangeValidator,
     OptionsValidator,
     Theme,
 )
@@ -46,6 +48,11 @@ class Config(QConfig):
     importFileFormat = OptionsConfigItem("Import", "FileFormat", "Excel", OptionsValidator(["CSV", "Excel", "TXT", "MAT"]))
     dataDirection = OptionsConfigItem("Import", "DataDirection", "vertical", OptionsValidator(["horizontal", "vertical"]))
     ignoreFirstLine = ConfigItem("Import", "IgnoreFirstLine", False, BoolValidator())
+    dimCFIndex = RangeConfigItem("Import", "dimCFIndex", 0, RangeValidator(0, 10))
+    dimPWIndex = RangeConfigItem("Import", "dimPWIndex", 1, RangeValidator(0, 10))
+    dimPAIndex = RangeConfigItem("Import", "dimPAIndex", 2, RangeValidator(0, 10))
+    dimDOAIndex = RangeConfigItem("Import", "dimDOAIndex", 3, RangeValidator(0, 10))
+    dimTOAIndex = RangeConfigItem("Import", "dimTOAIndex", 4, RangeValidator(0, 10))
 
     def __init__(self):
         """初始化应用程序配置"""
@@ -59,4 +66,4 @@ cfg.themeMode.value = Theme.AUTO
 # 导入配置文件
 # 获取项目根目录的绝对路径
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-qconfig.load(os.path.join(project_root, "app/config/app_config/config.json"), cfg)
+qconfig.load(os.path.join(project_root, "app/config/config.json"), cfg)

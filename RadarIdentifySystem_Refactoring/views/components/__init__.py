@@ -6,8 +6,11 @@
 
 from .options_with_icon_card import OptionsWithIconCard
 from .params_config_widget import ParamsConfigWidget
+from .options_group_setting_card import OptionsGroupWidget, OptionsGroupSettingCard
 
 __all__ = [
     'OptionsWithIconCard',
     'ParamsConfigWidget',
+    'OptionsGroupWidget',
+    'OptionsGroupSettingCard',
 ]

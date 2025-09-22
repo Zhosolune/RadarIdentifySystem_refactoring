@@ -1,7 +1,12 @@
 {
     "Import": {
         "DataDirection": "vertical",
-        "IgnoreFirstLine": false,
+        "dimCFIndex": 1,
+        "dimDOAIndex": 6,
+        "dimPAIndex": 4,
+        "dimPWIndex": 2,
+        "dimTOAIndex": 8,
+        "IgnoreFirstLine": true,
         "FileFormat": "Excel"
     },
     "MainWindow": {

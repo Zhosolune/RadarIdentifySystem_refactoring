@@ -22,7 +22,7 @@ from models.ui.dimensions import UIDimensions
 from models.utils.log_manager import LoggerMixin
 from models.utils.icons_manager import Icon
 from models.config.app_config import cfg
-from views.components import OptionsWithIconCard
+from views.components import OptionsWithIconCard, OptionsGroupWidget, OptionsGroupSettingCard
 
 class ParamsConfigInterface(ScrollArea, LoggerMixin):
     """参数配置界面
@@ -31,7 +31,7 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
     """
 
     def __init__(self, text: str, parent: Optional[QWidget] = None):
-        """初始化设置界面
+        """初始化参数配置界面
 
         Args:
             text: 界面标识文本
@@ -65,11 +65,27 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
         self.ignoreFirstLineCard = SwitchSettingCard(
             Icon.IGNORE_FIRST_LINE, 
             "忽略首行", 
-            "如果文件的第一行是表头等信息，开启开关可以在导入数据时忽略第一行", 
+            "如果文件的第一行/列是表头等信息，可以选择在导入数据时忽略第一行/列", 
             cfg.ignoreFirstLine, 
             parent=self.importGroup
         )
         self._setup_switch(self.ignoreFirstLineCard)
+        self.dimIndexSettingCard = None
+        self.dimIndexSettingCard = OptionsGroupSettingCard(
+            FIF.IOT,
+            "维度索引",
+            "选择脉冲数据的各个维度在文件中的索引，以动态匹配不同的数据包格式。（索引从0开始）",
+            [
+                OptionsGroupWidget(cfg.dimCFIndex, "CF索引", parent=self.dimIndexSettingCard),
+                OptionsGroupWidget(cfg.dimPWIndex, "PW索引", parent=self.dimIndexSettingCard),
+                OptionsGroupWidget(cfg.dimPAIndex, "PA索引", parent=self.dimIndexSettingCard),
+                OptionsGroupWidget(cfg.dimDOAIndex, "DOA索引", parent=self.dimIndexSettingCard),
+                OptionsGroupWidget(cfg.dimTOAIndex, "TOA索引", parent=self.dimIndexSettingCard),
+            ],
+            parent=self.importGroup,
+        )
+
+
 
 
 
@@ -108,6 +124,7 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
         self.importGroup.addSettingCard(self.importFileFormatCard)
         self.importGroup.addSettingCard(self.dataDirectionCard)
         self.importGroup.addSettingCard(self.ignoreFirstLineCard)
+        self.importGroup.addSettingCard(self.dimIndexSettingCard)
 
         # 添加卡片组到布局
         self.expandLayout.setSpacing(28)

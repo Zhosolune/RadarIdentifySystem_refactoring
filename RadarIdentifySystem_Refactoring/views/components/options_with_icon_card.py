@@ -1,14 +1,13 @@
 from typing import Union, Optional
 from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QButtonGroup, QLabel, QWidget, QVBoxLayout
+from PyQt6.QtWidgets import QButtonGroup, QLabel, QWidget
 
 from qfluentwidgets import (
     RadioButton,
     FluentIcon as FIF,
     ExpandSettingCard,
     qconfig,
-    ConfigItem,
     OptionsConfigItem,
 )
 from views.components.option_with_icon import OptionsWithIcon
@@ -55,6 +54,7 @@ class OptionsWithIconCard(ExpandSettingCard):
         初始化带图标选项的展开设置卡片
         
         Args:
+        ---------
             configItem: 关联的配置项对象，用于读取和保存选项值
             icon: 卡片标题栏显示的图标，可以是字符串路径、QIcon对象或FluentIcon枚举
             title: 卡片标题文本
@@ -62,6 +62,7 @@ class OptionsWithIconCard(ExpandSettingCard):
             parent: 父组件，默认为None
             
         Returns:
+        ---------
             None
         """
         super().__init__(icon, title, content, parent)
