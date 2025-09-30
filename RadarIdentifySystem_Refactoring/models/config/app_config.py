@@ -35,10 +35,6 @@ class Config(QConfig):
     管理应用程序的所有需要使用ConfigItem的配置项。
     """
 
-    # 文件
-    # musicFolders = ConfigItem("Folders", "LocalMusic", [], FolderListValidator())
-    # downloadFolder = ConfigItem("Folders", "Download", "app/download", FolderValidator())
-
     # 主窗口
     micaEnabled = ConfigItem("MainWindow", "MicaEnabled", isWin11(), BoolValidator())
     dpiScale = OptionsConfigItem("MainWindow", "DpiScale", "Auto", OptionsValidator([1, 1.25, 1.5, 1.75, 2, "Auto"]))

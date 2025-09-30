@@ -85,6 +85,15 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
             parent=self.importGroup,
         )
 
+        # 切片设置
+        self.sliceGroup = SettingCardGroup("切片设置", self.scrollWidget)
+        
+
+
+        # 绘图设置
+        self.plotGroup = SettingCardGroup("绘图设置", self.scrollWidget)
+        
+
 
 
 
@@ -130,6 +139,8 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
         self.expandLayout.setSpacing(28)
         self.expandLayout.setContentsMargins(36, 10, 36, 0)
         self.expandLayout.addWidget(self.importGroup)
+        self.expandLayout.addWidget(self.sliceGroup)
+        self.expandLayout.addWidget(self.plotGroup)
 
 
 
