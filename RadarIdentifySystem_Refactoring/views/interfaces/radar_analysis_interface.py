@@ -17,7 +17,6 @@ class RadarAnalysisInterface(QWidget):
             parent: 父控件
         """
         super().__init__(parent)
-
         self.setObjectName("RadarAnalysisInterface")
         
         # 设置UI

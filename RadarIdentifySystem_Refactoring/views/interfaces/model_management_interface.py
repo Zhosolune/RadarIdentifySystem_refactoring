@@ -17,7 +17,6 @@ class ModelManagementInterface(QWidget):
             parent: 父控件
         """
         super().__init__(parent)
-
         self.setObjectName("ModelManagementInterface")
         
         # 设置UI

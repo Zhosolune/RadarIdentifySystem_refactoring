@@ -1,11 +1,11 @@
 {
     "Import": {
         "DataDirection": "vertical",
-        "dimCFIndex": 1,
-        "dimDOAIndex": 6,
+        "dimCFIndex": 0,
+        "dimDOAIndex": 5,
         "dimPAIndex": 4,
         "dimPWIndex": 2,
-        "dimTOAIndex": 8,
+        "dimTOAIndex": 7,
         "IgnoreFirstLine": true,
         "FileFormat": "Excel"
     },

@@ -17,4 +17,5 @@ __all__ = [
     'OptionsGroupWidget',
     'OptionsGroupSettingCard',
     'RangeSlider',
+    'StepSlider',
 ]

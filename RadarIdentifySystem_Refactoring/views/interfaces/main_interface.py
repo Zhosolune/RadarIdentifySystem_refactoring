@@ -24,11 +24,11 @@ class MainInterface(QWidget, LoggerMixin):
             parent: 父控件
         """
         super().__init__(parent)
+        self.setObjectName("MainInterface")
         
         # 创建子组件
         self.left_scroll_area = None
         self.right_scroll_area = None
-        self.setObjectName("MainInterface")
         StyleSheet.MAIN_INTERFACE.apply(self)
         
         # 设置UI

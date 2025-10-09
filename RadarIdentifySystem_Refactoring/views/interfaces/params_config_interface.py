@@ -1,3 +1,4 @@
+from calendar import c
 from PyQt6.QtWidgets import QWidget, QLabel
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QResizeEvent
@@ -5,6 +6,7 @@ from qfluentwidgets import (
     OptionsSettingCard,
     ComboBoxSettingCard,
     ExpandLayout,
+    RangeSettingCard,
     ScrollArea,
     SettingCardGroup,
     SwitchSettingCard,
@@ -38,6 +40,7 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
             parent: 父控件
         """
         super().__init__(parent=parent)
+        self.setObjectName("ParamsConfigInterface")
         self.scrollWidget = QWidget()
         self.scrollWidget.setMaximumWidth(UIDimensions.SCROLL_AREA_MAX_WIDTH_SETTING)
         self.expandLayout = ExpandLayout(self.scrollWidget)
@@ -87,6 +90,13 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
 
         # 切片设置
         self.sliceGroup = SettingCardGroup("切片设置", self.scrollWidget)
+        self.sliceLengthCard = RangeSettingCard(
+            cfg.sliceLength,
+            Icon.SLICE_LENGTH,
+            "切片长度",
+            "选择每次处理的数据长度（样本数）",
+            parent=self.sliceGroup
+        )
         
 
 
@@ -108,7 +118,6 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
         self.setViewportMargins(0, 80, 0, 20)
         self.setWidget(self.scrollWidget)
         self.setWidgetResizable(True)
-        self.setObjectName("ParamsConfigInterface")
 
         # 设置滚动区域居中对齐
         self.setAlignment(Qt.AlignmentFlag.AlignHCenter)

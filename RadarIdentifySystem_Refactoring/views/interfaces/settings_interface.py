@@ -36,6 +36,7 @@ class SettingsInterface(ScrollArea, LoggerMixin):
             parent: 父控件
         """
         super().__init__(parent=parent)
+        self.setObjectName("SettingsInterface")
         self.scrollWidget = QWidget()
         self.scrollWidget.setMaximumWidth(UIDimensions.SCROLL_AREA_MAX_WIDTH_SETTING)
         self.expandLayout = ExpandLayout(self.scrollWidget)
@@ -118,7 +119,6 @@ class SettingsInterface(ScrollArea, LoggerMixin):
         self.setViewportMargins(0, 80, 0, 20)
         self.setWidget(self.scrollWidget)
         self.setWidgetResizable(True)
-        self.setObjectName("SettingsInterface")
         
         # 设置滚动区域居中对齐
         self.setAlignment(Qt.AlignmentFlag.AlignHCenter)
