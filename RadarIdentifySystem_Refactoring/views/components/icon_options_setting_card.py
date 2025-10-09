@@ -10,7 +10,7 @@ from qfluentwidgets import (
     qconfig,
     OptionsConfigItem,
 )
-from views.components.option_with_icon import OptionsWithIcon
+from views.base import OptionsWithIcon
 from models.utils.icons_manager import Icon
 
 class OptionsWithIconCard(ExpandSettingCard):

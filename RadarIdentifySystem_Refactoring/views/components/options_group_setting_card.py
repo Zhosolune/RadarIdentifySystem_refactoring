@@ -7,22 +7,25 @@ from models.utils.log_manager import LoggerMixin
 
 class OptionsGroupWidget(QWidget, LoggerMixin):
     """
-    带图标的选项组件，支持悬浮和点击效果
+    选项组组件，支持智能交换机制
 
-    这是一个自定义的选项卡片组件，包含图标、标题、描述文本和单选按钮。
-    支持鼠标悬浮效果和点击整个卡片来选中选项的功能。
-    支持编号互斥功能，确保不同组件不能选择相同编号。
+    这是一个自定义的选项组件，包含标题标签和多个选项按钮。
+    支持智能交换机制：当选择已被其他组件占用的编号时，会自动与占用该编号的组件交换，
+    或清空占用该编号的组件（如果当前组件未选择任何编号）。
+
+    Signals:
+        optionChanged (int, object): 选项值改变时发出，传递新值和当前组件实例
 
     Attributes:
-        configItem (RangeConfigItem): 配置项
-        configName (str): 配置名称
+        configItem (RangeConfigItem): 配置项，定义选项的范围和当前值
+        configName (str): 配置项名称
         titleLabel (BodyLabel): 显示标题的标签
-        buttonGroup (QButtonGroup): 按钮组
-        optionCurent (int): 当前选择的选项
+        buttonGroup (QButtonGroup): 管理所有选项按钮的按钮组
+        optionCurent (int): 当前选择的选项值（已弃用，使用configItem.value）
         hBoxLayout (QHBoxLayout): 水平布局管理器
-        _parent_card (OptionsGroupSettingCard): 父级设置卡片，用于编号互斥
+        parent_card (Optional[OptionsGroupSettingCard]): 父级设置卡片，用于智能交换功能
     """
-    optionChanged = pyqtSignal(int, object)  # 修改信号，传递选择的值和当前组件实例
+    optionChanged = pyqtSignal(int, object)  # 传递选择的值和当前组件实例
 
     def __init__(self, configItem: RangeConfigItem, title: str, parent: Optional[QWidget] = None) -> None:
         """

@@ -3,7 +3,7 @@ from PyQt6.QtCore import Qt, QPoint
 from PyQt6.QtWidgets import QWidget
 
 from qfluentwidgets import Slider
-from views.base.overload import singledispatchmethod
+from models.base import singledispatchmethod
 
 
 class StepSlider(Slider):

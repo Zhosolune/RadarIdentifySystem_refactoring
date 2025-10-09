@@ -51,7 +51,7 @@ class Config(QConfig):
     dimTOAIndex = RangeConfigItem("Import", "dimTOAIndex", 4, RangeValidator(0, 10))
 
     # 切片设置
-    sliceLength = RangeConfigItem("Slice", "sliceLength", 250, RangeValidator(1, 1000))
+    sliceLength = RangeConfigItem("Slice", "sliceLength", 250, RangeValidator(10, 1000))
         
     def __init__(self):
         """初始化应用程序配置"""

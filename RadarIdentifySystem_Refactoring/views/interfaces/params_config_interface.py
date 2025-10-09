@@ -24,7 +24,7 @@ from models.ui.dimensions import UIDimensions
 from models.utils.log_manager import LoggerMixin
 from models.utils.icons_manager import Icon
 from models.config.app_config import cfg
-from views.components import OptionsWithIconCard, OptionsGroupWidget, OptionsGroupSettingCard
+from views.components import OptionsWithIconCard, OptionsGroupWidget, OptionsGroupSettingCard, StepRangeSettingCard
 
 class ParamsConfigInterface(ScrollArea, LoggerMixin):
     """参数配置界面
@@ -90,11 +90,11 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
 
         # 切片设置
         self.sliceGroup = SettingCardGroup("切片设置", self.scrollWidget)
-        self.sliceLengthCard = RangeSettingCard(
+        self.sliceLengthCard = StepRangeSettingCard(
             cfg.sliceLength,
-            Icon.SLICE_LENGTH,
+            FIF.DOWNLOAD,
             "切片长度",
-            "选择每次处理的数据长度（样本数）",
+            "设定每一个数据切片的持续时间，单位：毫秒(ms)",
             parent=self.sliceGroup
         )
         
@@ -143,6 +143,8 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
         self.importGroup.addSettingCard(self.dataDirectionCard)
         self.importGroup.addSettingCard(self.ignoreFirstLineCard)
         self.importGroup.addSettingCard(self.dimIndexSettingCard)
+
+        self.sliceGroup.addSettingCard(self.sliceLengthCard)
 
         # 添加卡片组到布局
         self.expandLayout.setSpacing(28)
