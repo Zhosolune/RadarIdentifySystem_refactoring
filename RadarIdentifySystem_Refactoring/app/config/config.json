@@ -15,7 +15,9 @@
         "MicaEnabled": true
     },
     "Slice": {
-        "sliceLength": 250
+        "sliceLength": 250,
+        "timeFlipProc": "reserve",
+        "timeFlipReserve": "sequential"
     },
     "QFluentWidgets": {
         "ThemeColor": "#ff4772c3",

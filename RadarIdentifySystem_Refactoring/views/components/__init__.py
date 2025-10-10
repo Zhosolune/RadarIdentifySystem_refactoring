@@ -7,6 +7,7 @@
 from .icon_options_setting_card import OptionsWithIconCard
 from .options_group_setting_card import OptionsGroupWidget, OptionsGroupSettingCard
 from .step_range_setting_card import StepRangeSettingCard
+from .time_flip_setting_card import TimeFlipSettingCard
 
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     'OptionsGroupWidget',
     'OptionsGroupSettingCard',
     'StepRangeSettingCard',
+    'TimeFlipSettingCard',
 ]

@@ -24,7 +24,7 @@ from models.ui.dimensions import UIDimensions
 from models.utils.log_manager import LoggerMixin
 from models.utils.icons_manager import Icon
 from models.config.app_config import cfg
-from views.components import OptionsWithIconCard, OptionsGroupWidget, OptionsGroupSettingCard, StepRangeSettingCard
+from views.components import OptionsWithIconCard, OptionsGroupWidget, OptionsGroupSettingCard, StepRangeSettingCard, TimeFlipSettingCard
 
 class ParamsConfigInterface(ScrollArea, LoggerMixin):
     """参数配置界面
@@ -73,6 +73,7 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
             parent=self.importGroup
         )
         self._setup_switch(self.ignoreFirstLineCard)
+        # OptionsGroupWidget的创建需要父组件dimIndexSettingCard提前声明
         self.dimIndexSettingCard = None
         self.dimIndexSettingCard = OptionsGroupSettingCard(
             FIF.IOT,
@@ -95,6 +96,15 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
             FIF.DOWNLOAD,
             "切片长度",
             "设定每一个数据切片的持续时间，单位：毫秒(ms)",
+            parent=self.sliceGroup
+        )
+        self.timeFlipProcCard = TimeFlipSettingCard(
+            cfg.timeFlipProc, 
+            cfg.timeFlipReserve,
+            FIF.CARE_RIGHT_SOLID, 
+            "时间翻折处理", 
+            "对于数据溢出导致的到达时间翻折情况的处理策略。", 
+            texts=["强制重合", "自然衔接"], 
             parent=self.sliceGroup
         )
         
@@ -145,6 +155,8 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
         self.importGroup.addSettingCard(self.dimIndexSettingCard)
 
         self.sliceGroup.addSettingCard(self.sliceLengthCard)
+        self.sliceGroup.addSettingCard(self.timeFlipProcCard)
+
 
         # 添加卡片组到布局
         self.expandLayout.setSpacing(28)

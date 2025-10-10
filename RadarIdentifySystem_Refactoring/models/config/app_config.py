@@ -52,6 +52,8 @@ class Config(QConfig):
 
     # 切片设置
     sliceLength = RangeConfigItem("Slice", "sliceLength", 250, RangeValidator(10, 1000))
+    timeFlipProc = OptionsConfigItem("Slice", "timeFlipProc", "reserve", OptionsValidator(["discard", "reserve"]))
+    timeFlipReserve = OptionsConfigItem("Slice", "timeFlipReserve", "overlapping", OptionsValidator(["overlapping", "sequential", "none"]))
         
     def __init__(self):
         """初始化应用程序配置"""
