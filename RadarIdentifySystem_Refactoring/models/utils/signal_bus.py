@@ -16,16 +16,6 @@ class MainWindowSignalBus(QObject):
     settingInterfaceRestartSig = pyqtSignal()
 
 
-class ParamsConfigSignalBus(QObject):
-    """参数配置信号总线类
-    
-    用于管理应用程序中的参数配置类的全局信号，实现组件间的解耦通信。
-    """
-
-    # 参数配置信号
-    paramChanged = pyqtSignal(str, object)  # (param_name, new_value)
-
 
 # 创建信号总线实例
 mw_signalBus = MainWindowSignalBus()
-pc_signalBus = ParamsConfigSignalBus()

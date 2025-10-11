@@ -103,8 +103,8 @@ class ParamsConfigInterface(ScrollArea, LoggerMixin):
             cfg.timeFlipReserve,
             FIF.CARE_RIGHT_SOLID, 
             "时间翻折处理", 
-            "对于数据溢出导致的到达时间翻折情况的处理策略。", 
-            texts=["强制重合", "自然衔接"], 
+            "对于数据溢出导致的到达时间重置情况的处理策略。", 
+            texts=["首尾拼合", "序列相接"], 
             parent=self.sliceGroup
         )
         

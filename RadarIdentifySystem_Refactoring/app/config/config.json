@@ -17,7 +17,7 @@
     "Slice": {
         "sliceLength": 250,
         "timeFlipProc": "reserve",
-        "timeFlipReserve": "sequential"
+        "timeFlipReserve": "concatenation"
     },
     "QFluentWidgets": {
         "ThemeColor": "#ff4772c3",

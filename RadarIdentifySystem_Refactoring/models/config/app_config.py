@@ -43,7 +43,7 @@ class Config(QConfig):
     # 导入设置
     importFileFormat = OptionsConfigItem("Import", "FileFormat", "Excel", OptionsValidator(["CSV", "Excel", "TXT", "MAT"]))
     dataDirection = OptionsConfigItem("Import", "DataDirection", "vertical", OptionsValidator(["horizontal", "vertical"]))
-    ignoreFirstLine = ConfigItem("Import", "IgnoreFirstLine", False, BoolValidator())
+    ignoreFirstLine = ConfigItem("Import", "IgnoreFirstLine", True, BoolValidator())
     dimCFIndex = RangeConfigItem("Import", "dimCFIndex", 0, RangeValidator(0, 10))
     dimPWIndex = RangeConfigItem("Import", "dimPWIndex", 1, RangeValidator(0, 10))
     dimPAIndex = RangeConfigItem("Import", "dimPAIndex", 2, RangeValidator(0, 10))
@@ -53,7 +53,7 @@ class Config(QConfig):
     # 切片设置
     sliceLength = RangeConfigItem("Slice", "sliceLength", 250, RangeValidator(10, 1000))
     timeFlipProc = OptionsConfigItem("Slice", "timeFlipProc", "reserve", OptionsValidator(["discard", "reserve"]))
-    timeFlipReserve = OptionsConfigItem("Slice", "timeFlipReserve", "overlapping", OptionsValidator(["overlapping", "sequential", "none"]))
+    timeFlipReserve = OptionsConfigItem("Slice", "timeFlipReserve", "concatenation", OptionsValidator(["concatenation", "sequence", "none"]))
         
     def __init__(self):
         """初始化应用程序配置"""
