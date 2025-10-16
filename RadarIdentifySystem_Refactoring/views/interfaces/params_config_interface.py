@@ -1,21 +1,12 @@
-from calendar import c
 from PyQt6.QtWidgets import QWidget, QLabel
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QResizeEvent
 from qfluentwidgets import (
-    OptionsSettingCard,
     ComboBoxSettingCard,
     ExpandLayout,
-    RangeSettingCard,
     ScrollArea,
     SettingCardGroup,
     SwitchSettingCard,
-    CustomColorSettingCard,
-    HyperlinkCard,
-    PrimaryPushSettingCard,
-    MessageBox,
-    InfoBar,
-    ExpandGroupSettingCard,
 )
 from qfluentwidgets import FluentIcon as FIF
 from typing import Optional
