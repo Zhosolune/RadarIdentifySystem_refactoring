@@ -1,7 +1,6 @@
 # coding: utf-8
 import os
 from enum import Enum
-from tkinter import HORIZONTAL
 
 from qfluentwidgets import FluentIconBase, getIconColor, Theme
 
