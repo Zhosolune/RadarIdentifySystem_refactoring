@@ -4,7 +4,7 @@
         "dimCFIndex": 0,
         "dimDOAIndex": 5,
         "dimPAIndex": 4,
-        "dimPWIndex": 2,
+        "dimPWIndex": 1,
         "dimTOAIndex": 7,
         "IgnoreFirstLine": true,
         "FileFormat": "Excel"
@@ -14,13 +14,18 @@
         "LogLevel": "DEBUG",
         "MicaEnabled": true
     },
+    "QFluentWidgets": {
+        "FontFamilies": [
+            "Segoe UI",
+            "Microsoft YaHei",
+            "PingFang SC"
+        ],
+        "ThemeColor": "#ff4772c3",
+        "ThemeMode": "Auto"
+    },
     "Slice": {
         "sliceLength": 250,
         "timeFlipProc": "reserve",
         "timeFlipReserve": "concatenation"
-    },
-    "QFluentWidgets": {
-        "ThemeColor": "#ff4772c3",
-        "ThemeMode": "Auto"
     }
 }
